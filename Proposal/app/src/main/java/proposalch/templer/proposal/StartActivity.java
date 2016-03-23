@@ -3,6 +3,7 @@ package proposalch.templer.proposal;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,12 +14,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import location.LocationService;
 
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity implements LocationService.LocationChangedListener, LocationService.LocationReachedListener {
 
     private LocationService locationService;
+    private EditText coordinateContainer;
+    private double longitude = 7.437491;
+    private double latitude = 46.947213;
+    //radius in meters
+    private int radius = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +63,13 @@ public class StartActivity extends AppCompatActivity {
                         1);
             }
         } else {
-            locationService = new LocationService(this, 2000, 1);
+            locationService = new LocationService(this, 1000, 1);
+            locationService.setLocationChangedListener(this);
+            locationService.setLocationReachedListener(this, longitude, latitude, radius);
         }
 
 
+        coordinateContainer = (EditText) findViewById(R.id.coordinateContainer);
     }
 
     @Override
@@ -103,5 +114,18 @@ public class StartActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        String msg = location.getLatitude() + ", " + location.getLongitude();
+        coordinateContainer.getText().append("\n");
+        coordinateContainer.getText().append(msg);
+    }
+
+    @Override
+    public void onLocationReached(Location location) {
+        String msg = location.getLatitude() + ", " + location.getLongitude();
+        Toast.makeText(this, "Location reached event", Toast.LENGTH_LONG).show();
     }
 }

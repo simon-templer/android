@@ -16,8 +16,24 @@ import android.widget.Toast;
  */
 
 public class LocationService implements android.location.LocationListener {
+
+    public interface LocationChangedListener {
+        void onLocationChanged(Location location);
+    }
+
+    public interface LocationReachedListener {
+        void onLocationReached(Location location);
+    }
+
     private LocationManager locationManager;
     private Context context;
+    private LocationChangedListener locationChangedListener;
+    private LocationReachedListener locationReachedListener;
+
+    private double longitude;
+    private double latitude;
+    private int radius;
+
 
     private static int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
 
@@ -43,12 +59,32 @@ public class LocationService implements android.location.LocationListener {
     private void TryGetLocationAsync() {
     }
 
+    public void setLocationChangedListener(LocationChangedListener eventListener) {
+        locationChangedListener = eventListener;
+    }
+
+    public void setLocationReachedListener(LocationReachedListener eventListener, double longitude, double latitude, int radius) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.radius = radius;
+        this.locationReachedListener = eventListener;
+    }
+
     @Override
     public void onLocationChanged(Location location) {
-        String msg = "New Latitude: " + location.getLatitude()
-                + "New Longitude: " + location.getLongitude();
+        locationChangedListener.onLocationChanged(location);
+        if (locationReached(location)) {
+            locationReachedListener.onLocationReached(location);
+        }
 
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+    }
+
+    private boolean locationReached(Location location) {
+        //calculate id point is inside destination circle (position + radius)
+        float[] results = new float[1];
+        Location.distanceBetween(this.latitude, this.longitude, location.getLatitude(), location.getLongitude(), results);
+        float distanceInMeters = results[0];
+        return distanceInMeters < this.radius;
     }
 
     @Override
