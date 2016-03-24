@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="combobox_array">
+        <item>Fragment1</item>
+        <item>Fragment2</item>
+        <item>Fragment3</item>
+        <item>Fragment4</item>
+    </string-array>
+</resources>
