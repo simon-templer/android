@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.templer.activities.R;
+import ch.templer.viewpagger.InfinitePagerAdapter;
 import ch.templer.viewpagger.SampleAdapter;
 
 /**
@@ -76,9 +77,8 @@ public class PictureSlideshowFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_picture_slideshow, container, false);
         View result=inflater.inflate(R.layout.pager, container, false);
         ViewPager pager=(ViewPager)result.findViewById(R.id.pager);
-
-        pager.setAdapter(buildAdapter());
-        pager.setCurrentItem(pager.getChildCount() * SampleAdapter.LOOPS_COUNT / 2, false); // set current item in the adapter to middle
+        PagerAdapter adapter = new InfinitePagerAdapter(buildAdapter());
+        pager.setAdapter(adapter);
         return(result);
     }
     private PagerAdapter buildAdapter() {
