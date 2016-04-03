@@ -10,8 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import fragments.PictureSlideshowFragment;
-import fragments.VideoFragment;
+import ch.templer.fragments.PictureSlideshowFragment;
+import ch.templer.fragments.VideoFragment;
 
 public class FragmentContainerActivity extends FragmentActivity implements PictureSlideshowFragment.OnFragmentInteractionListener, VideoFragment.OnFragmentInteractionListener, AdapterView.OnItemSelectedListener {
 
@@ -48,35 +48,35 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
-        if (findViewById(R.id.fragment_container) != null) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-            switch (position) {
-                case 0:
-                    PictureSlideshowFragment newFragment = new PictureSlideshowFragment();
-                    transaction.replace(R.id.fragment_container, newFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                    break;
-                case 1:
-                    VideoFragment newFragment1 = new VideoFragment();
-                    Bundle args = new Bundle();
-                    args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
-                    newFragment1.setArguments(args);
-                    transaction.replace(R.id.fragment_container, newFragment1);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-
-                    break;
-                default:
-                    break;
-            }
-        }
+//        if (findViewById(R.id.fragment_container) != null) {
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+//            switch (position) {
+//                case 0:
+//                    PictureSlideshowFragment newFragment = new PictureSlideshowFragment();
+//                    transaction.replace(R.id.fragment_container, newFragment);
+//                    transaction.addToBackStack(null);
+//                    transaction.commit();
+//                    break;
+//                case 1:
+//                    VideoFragment newFragment1 = new VideoFragment();
+//                    Bundle args = new Bundle();
+//                    args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
+//                    newFragment1.setArguments(args);
+//                    transaction.replace(R.id.fragment_container, newFragment1);
+//                    transaction.addToBackStack(null);
+//                    transaction.commit();
+//                    break;
+//                case 2:
+//
+//                    break;
+//                case 3:
+//
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
     }
 
     @Override

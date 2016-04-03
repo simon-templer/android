@@ -1,4 +1,4 @@
-package location;
+package ch.templer.location;
 
 import android.Manifest;
 import android.app.Activity;

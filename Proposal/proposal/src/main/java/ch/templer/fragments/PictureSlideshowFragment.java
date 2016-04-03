@@ -1,14 +1,17 @@
-package fragments;
+package ch.templer.fragments;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ch.templer.activities.R;
+import ch.templer.viewpagger.SampleAdapter;
 
 /**
  * A fragment with a Google +1 button.
@@ -30,6 +33,8 @@ public class PictureSlideshowFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private ViewPager viewPager;
 
     private OnFragmentInteractionListener mListener;
 
@@ -69,8 +74,16 @@ public class PictureSlideshowFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_picture_slideshow, container, false);
+        View result=inflater.inflate(R.layout.pager, container, false);
+        ViewPager pager=(ViewPager)result.findViewById(R.id.pager);
 
-        return view;
+        pager.setAdapter(buildAdapter());
+        pager.setCurrentItem(pager.getChildCount() * SampleAdapter.LOOPS_COUNT / 2, false); // set current item in the adapter to middle
+        return(result);
+    }
+    private PagerAdapter buildAdapter() {
+        int[] imageId = {R.drawable.img_6786, R.drawable.img_6787, R.drawable.img_6788, R.drawable.img_6792, R.drawable.img_6797, R.drawable.img_6812, R.drawable.img_6869, R.drawable.img_6870 };
+        return(new SampleAdapter(getActivity(), getChildFragmentManager(), imageId));
     }
 
     @Override
@@ -106,7 +119,7 @@ public class PictureSlideshowFragment extends Fragment {
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
+     * to the activity and potentially other ch.templer.fragments contained in that
      * activity.
      * <p/>
      * See the Android Training lesson <a href=
