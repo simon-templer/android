@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import ch.templer.data.TestData;
 import ch.templer.location.LocationService;
 
 public class StartActivity extends AppCompatActivity implements LocationService.LocationChangedListener, LocationService.LocationReachedListener, View.OnClickListener {
@@ -58,7 +59,6 @@ public class StartActivity extends AppCompatActivity implements LocationService.
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
 
                 } else {
                 }

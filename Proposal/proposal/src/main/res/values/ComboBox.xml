@@ -3,7 +3,7 @@
     <string-array name="combobox_array">
         <item>Picture Fragment</item>
         <item>Video Fragment</item>
-        <item>Fragment3</item>
+        <item>TextMessage Fragment</item>
         <item>Fragment4</item>
     </string-array>
 </resources>

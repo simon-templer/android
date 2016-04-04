@@ -1,0 +1,48 @@
+package ch.templer.data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ch.templer.activities.R;
+import ch.templer.model.Message;
+import ch.templer.model.PictureSlideshowModel;
+import ch.templer.model.TextMessagesModel;
+
+/**
+ * Created by Templer on 04.04.2016.
+ */
+public class TestData {
+    private List<Message> messages;
+
+    private static TestData instance = null;
+
+    public static TestData getInstance() {
+        if(instance == null) {
+            instance = new TestData();
+        }
+        return instance;
+    }
+
+    protected TestData() {
+        messages = new ArrayList<Message>();
+        generateTestData();
+    }
+
+    private void generateTestData() {
+
+        PictureSlideshowModel pictureSlideshowModel = new PictureSlideshowModel();
+        int[] imageIds = {R.drawable.img_6786, R.drawable.img_6787, R.drawable.img_6788, R.drawable.img_6792, R.drawable.img_6797, R.drawable.img_6812, R.drawable.img_6869, R.drawable.img_6870 };
+        pictureSlideshowModel.setImageIDs(imageIds);
+        this.messages.add(pictureSlideshowModel);
+
+        TextMessagesModel textMessagesModel = new TextMessagesModel();
+        String[] texts = new String[]{"Text Message 1", "Text Message 2", "Text Message 3", "Text Message 4", "Text Message 5", "Text Message 6"};
+        textMessagesModel.setMessages(texts);
+        textMessagesModel.setShowTime(3000);
+        this.messages.add(textMessagesModel);
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+}

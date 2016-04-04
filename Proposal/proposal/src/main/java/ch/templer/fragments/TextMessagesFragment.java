@@ -1,6 +1,9 @@
 package ch.templer.fragments;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,37 +12,35 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 
 import ch.templer.activities.R;
 import ch.templer.viewpagger.InfinitePagerAdapter;
-import ch.templer.viewpagger.SampleAdapter;
 
 /**
- * A fragment with a Google +1 button.
+ * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PictureSlideshowFragment.OnFragmentInteractionListener} interface
+ * {@link TextMessagesFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link PictureSlideshowFragment#newInstance} factory method to
+ * Use the {@link TextMessagesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PictureSlideshowFragment extends Fragment {
+public class TextMessagesFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    // The request code must be 0 or greater.
-    private static final int PLUS_ONE_REQUEST_CODE = 0;
-    // The URL to +1.  Must be a valid URL.
-    private final String PLUS_ONE_URL = "http://developer.android.com";
+    private FrameLayout layout;
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
-    private ViewPager viewPager;
-
     private OnFragmentInteractionListener mListener;
 
-    public PictureSlideshowFragment() {
+    public TextMessagesFragment() {
         // Required empty public constructor
     }
 
@@ -49,11 +50,11 @@ public class PictureSlideshowFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment PictureSlideshowFragment.
+     * @return A new instance of fragment TextMessagesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PictureSlideshowFragment newInstance(String param1, String param2) {
-        PictureSlideshowFragment fragment = new PictureSlideshowFragment();
+    public static TextMessagesFragment newInstance(String param1, String param2) {
+        TextMessagesFragment fragment = new TextMessagesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -74,21 +75,40 @@ public class PictureSlideshowFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.pager, container, false);
-        ViewPager pager=(ViewPager)view.findViewById(R.id.pager);
-        PagerAdapter adapter = new InfinitePagerAdapter(buildAdapter());
-        pager.setAdapter(adapter);
+
+        View view = inflater.inflate(R.layout.fragment_text_messages, container, false);
+        layout = (FrameLayout)view.findViewById(R.id.TextMessageFragment_FrameLayout);
+
+
         return(view);
-    }
-    private PagerAdapter buildAdapter() {
-        int[] imageId = {R.drawable.img_6786, R.drawable.img_6787, R.drawable.img_6788, R.drawable.img_6792, R.drawable.img_6797, R.drawable.img_6812, R.drawable.img_6869, R.drawable.img_6870 };
-        return(new SampleAdapter(getActivity(), getChildFragmentManager(), imageId));
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
 
+        Animation anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
+
+        anim.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+                // additional functionality
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                // additional functionality
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ObjectAnimator animator = ObjectAnimator.ofInt(layout, "backgroundColor", Color.RED, Color.BLUE).setDuration(3000);
+                animator.setEvaluator(new ArgbEvaluator());
+                animator.start();
+            }
+        });
+
+        return anim;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -118,7 +138,7 @@ public class PictureSlideshowFragment extends Fragment {
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other ch.templer.fragments contained in that
+     * to the activity and potentially other fragments contained in that
      * activity.
      * <p/>
      * See the Android Training lesson <a href=
@@ -129,5 +149,4 @@ public class PictureSlideshowFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
 }
