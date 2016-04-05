@@ -6,18 +6,21 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.TextView;
+
+import java.util.List;
+import java.util.Timer;
 
 import ch.templer.activities.R;
-import ch.templer.viewpagger.InfinitePagerAdapter;
+import ch.templer.model.TextMessagesModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,13 +33,15 @@ import ch.templer.viewpagger.InfinitePagerAdapter;
 public class TextMessagesFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String TEXT_MESSAGES_ID = "textMessageID";
+    private static final String SHOW_TIME_ID = "showTimeID";
     private FrameLayout layout;
+    private TextView content;
+    private Timer timer = new Timer();
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private List<String> textMessages;
+    private int showTime;
 
     private OnFragmentInteractionListener mListener;
 
@@ -48,16 +53,14 @@ public class TextMessagesFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment TextMessagesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TextMessagesFragment newInstance(String param1, String param2) {
+    public static TextMessagesFragment newInstance(TextMessagesModel textMessagesModel) {
         TextMessagesFragment fragment = new TextMessagesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putStringArrayList(TEXT_MESSAGES_ID, textMessagesModel.getMessages());
+        args.putInt(SHOW_TIME_ID, textMessagesModel.getShowTime());
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,8 +69,8 @@ public class TextMessagesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            textMessages = getArguments().getStringArrayList(TEXT_MESSAGES_ID);
+            showTime = getArguments().getInt(SHOW_TIME_ID);
         }
     }
 
@@ -77,18 +80,37 @@ public class TextMessagesFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_text_messages, container, false);
-        layout = (FrameLayout)view.findViewById(R.id.TextMessageFragment_FrameLayout);
+        layout = (FrameLayout) view.findViewById(R.id.TextMessageFragment_FrameLayout);
+        content = (TextView) view.findViewById(R.id.text_messages_fragment_content_textview);
+
+        new CountDownTimer(textMessages.size() * showTime , showTime) {
+
+            public void onTick(long millisUntilFinished) {
+                content.setText(textMessages.get(0));
+                textMessages.remove(0);
+            }
+
+            public void onFinish() {
+                content.setText(textMessages.get(0));
+                textMessages.remove(0);
+                //content.setText("done!");
+            }
+        }.start();
 
 
-        return(view);
+        return (view);
     }
 
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
 
         Animation anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
-
+        anim.setRepeatCount(Animation.INFINITE);
+        //anim.setRepeatMode(Animation.RESTART);
         anim.setAnimationListener(new Animation.AnimationListener() {
+
+            int[] colors = new int[]{Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN};
+            int counter = 0;
 
             @Override
             public void onAnimationStart(Animation animation) {
@@ -97,14 +119,18 @@ public class TextMessagesFragment extends Fragment {
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                // additional functionality
+
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                ObjectAnimator animator = ObjectAnimator.ofInt(layout, "backgroundColor", Color.RED, Color.BLUE).setDuration(3000);
+                if (counter >= colors.length){
+                    counter = 0;
+                }
+                ObjectAnimator animator = ObjectAnimator.ofInt(layout, "backgroundColor", colors[counter], colors[counter +1 ]).setDuration(3000);
                 animator.setEvaluator(new ArgbEvaluator());
                 animator.start();
+                counter ++;
             }
         });
 

@@ -36,7 +36,11 @@ public class TestData {
         this.messages.add(pictureSlideshowModel);
 
         TextMessagesModel textMessagesModel = new TextMessagesModel();
-        String[] texts = new String[]{"Text Message 1", "Text Message 2", "Text Message 3", "Text Message 4", "Text Message 5", "Text Message 6"};
+        ArrayList<String> texts = new ArrayList<String>();
+        texts.add("Text Message 1");
+        texts.add("Text Message 2");
+        texts.add("Text Message 3");
+        texts.add("Text Message 4");
         textMessagesModel.setMessages(texts);
         textMessagesModel.setShowTime(3000);
         this.messages.add(textMessagesModel);

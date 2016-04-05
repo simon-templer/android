@@ -1,18 +1,14 @@
 package ch.templer.activities;
 
-import android.app.ActionBar;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.widget.Button;
 
 import java.util.List;
 
@@ -25,7 +21,7 @@ import ch.templer.model.PictureSlideshowModel;
 import ch.templer.model.TextMessagesModel;
 import ch.templer.model.VideoModel;
 
-public class FragmentContainerActivity extends FragmentActivity implements PictureSlideshowFragment.OnFragmentInteractionListener, VideoFragment.OnFragmentInteractionListener, AdapterView.OnItemSelectedListener, TextMessagesFragment.OnFragmentInteractionListener {
+public class FragmentContainerActivity extends FragmentActivity implements PictureSlideshowFragment.OnFragmentInteractionListener, VideoFragment.OnFragmentInteractionListener, TextMessagesFragment.OnFragmentInteractionListener, View.OnClickListener {
 
     private List<Message> messages;
 
@@ -49,56 +45,51 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
                     .add(R.id.fragment_container, firstFragment).commit();
         }
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(this);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.combobox_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        Button nextFragmentButton = (Button) findViewById(R.id.next_fragment_button);
+        nextFragmentButton.setOnClickListener(this);
 
         messages = TestData.getInstance().getMessages();
-
         Message message = messages.get(0);
         messages.remove(0);
-
-        //processMessage(message);
+        processMessage(message);
     }
 
     private void processMessage(Message message) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 
-        if (message instanceof PictureSlideshowModel){
-            PictureSlideshowModel model = new PictureSlideshowModel();
-            PictureSlideshowFragment pictureSlideshowFragment = new PictureSlideshowFragment();
+        if (message instanceof PictureSlideshowModel) {
+            PictureSlideshowFragment pictureSlideshowFragment = PictureSlideshowFragment.newInstance((PictureSlideshowModel) message);
             transaction.replace(R.id.fragment_container, pictureSlideshowFragment);
             transaction.addToBackStack(null);
             transaction.commit();
-        }else if(message instanceof TextMessagesModel){
-
-        }else if(message instanceof VideoModel){
-
+        } else if (message instanceof TextMessagesModel) {
+            TextMessagesFragment textMessage = TextMessagesFragment.newInstance((TextMessagesModel) message);
+            transaction.replace(R.id.fragment_container, textMessage);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        } else if (message instanceof VideoModel) {
+            VideoFragment newFragment1 = new VideoFragment();
+            Bundle args = new Bundle();
+            args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
+            newFragment1.setArguments(args);
+            transaction.replace(R.id.fragment_container, newFragment1);
+            transaction.addToBackStack(null);
+            transaction.commit();
         }
-
-        PictureSlideshowFragment newFragment = new PictureSlideshowFragment();
-        transaction.replace(R.id.fragment_container, newFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-
-
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
 
 
@@ -108,46 +99,54 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // Check that the activity is using the layout version with
-        // the fragment_container FrameLayout
-        if (findViewById(R.id.fragment_container) != null) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+    public void onClick(View v) {
+        Message message = this.messages.get(0);
+        this.messages.remove(0);
 
-            switch (position) {
-                case 0:
-                    PictureSlideshowFragment pictureSlideshowFragment = new PictureSlideshowFragment();
-                    transaction.replace(R.id.fragment_container, pictureSlideshowFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                    break;
-                case 1:
-                    VideoFragment newFragment1 = new VideoFragment();
-                    Bundle args = new Bundle();
-                    args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
-                    newFragment1.setArguments(args);
-                    transaction.replace(R.id.fragment_container, newFragment1);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                    break;
-                case 2:
-                    TextMessagesFragment textMessage = new TextMessagesFragment();
-                    transaction.replace(R.id.fragment_container, textMessage);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                    break;
-                case 3:
-
-                    break;
-                default:
-                    break;
-            }
-        }
+        processMessage(message);
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    //  @Override
+//   public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//        // Check that the activity is using the layout version with
+//        // the fragment_container FrameLayout
+//        if (findViewById(R.id.fragment_container) != null) {
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+//
+//            switch (position) {
+//                case 0:
+//                    PictureSlideshowFragment pictureSlideshowFragment = new PictureSlideshowFragment();
+//                    transaction.replace(R.id.fragment_container, pictureSlideshowFragment);
+//                    transaction.addToBackStack(null);
+//                    transaction.commit();
+//                    break;
+//                case 1:
+//                    VideoFragment newFragment1 = new VideoFragment();
+//                    Bundle args = new Bundle();
+//                    args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
+//                    newFragment1.setArguments(args);
+//                    transaction.replace(R.id.fragment_container, newFragment1);
+//                    transaction.addToBackStack(null);
+//                    transaction.commit();
+//                    break;
+//                case 2:
+//                    TextMessagesFragment textMessage = new TextMessagesFragment();
+//                    transaction.replace(R.id.fragment_container, textMessage);
+//                    transaction.addToBackStack(null);
+//                    transaction.commit();
+//                    break;
+//                case 3:
+//
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//    }
 
-    }
+//    @Override
+//    public void onNothingSelected(AdapterView<?> parent) {
+//
+//    }
 }

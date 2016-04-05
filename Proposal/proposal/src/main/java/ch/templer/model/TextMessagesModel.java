@@ -1,17 +1,20 @@
 package ch.templer.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Templer on 04.04.2016.
  */
 public class TextMessagesModel extends Message {
-    private String[] messages;
+    private ArrayList<String> messages;
     private int showTime;
 
-    public String[] getMessages() {
+    public ArrayList<String> getMessages() {
         return messages;
     }
 
-    public void setMessages(String[] messages) {
+    public void setMessages(ArrayList<String> messages) {
         this.messages = messages;
     }
 

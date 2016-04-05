@@ -9,5 +9,12 @@
 
     <include layout="@layout/content_fragment_container" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="NextFragment"
+        android:id="@+id/next_fragment_button"
+        android:layout_gravity="center_horizontal|bottom" />
+
 
 </android.support.design.widget.CoordinatorLayout>

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.templer.activities.R;
+import ch.templer.model.PictureSlideshowModel;
 import ch.templer.viewpagger.InfinitePagerAdapter;
 import ch.templer.viewpagger.SampleAdapter;
 
@@ -25,15 +26,13 @@ import ch.templer.viewpagger.SampleAdapter;
 public class PictureSlideshowFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String IMAGE_IDS_KEY = "imageIds";
     // The request code must be 0 or greater.
     private static final int PLUS_ONE_REQUEST_CODE = 0;
     // The URL to +1.  Must be a valid URL.
     private final String PLUS_ONE_URL = "http://developer.android.com";
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int[] imageIds;
 
     private ViewPager viewPager;
 
@@ -46,17 +45,13 @@ public class PictureSlideshowFragment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment PictureSlideshowFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PictureSlideshowFragment newInstance(String param1, String param2) {
+    public static PictureSlideshowFragment newInstance(PictureSlideshowModel model) {
         PictureSlideshowFragment fragment = new PictureSlideshowFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putIntArray(IMAGE_IDS_KEY, model.getImageIDs());
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,8 +60,7 @@ public class PictureSlideshowFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            imageIds = getArguments().getIntArray(IMAGE_IDS_KEY);
         }
     }
 
@@ -81,8 +75,8 @@ public class PictureSlideshowFragment extends Fragment {
         return(view);
     }
     private PagerAdapter buildAdapter() {
-        int[] imageId = {R.drawable.img_6786, R.drawable.img_6787, R.drawable.img_6788, R.drawable.img_6792, R.drawable.img_6797, R.drawable.img_6812, R.drawable.img_6869, R.drawable.img_6870 };
-        return(new SampleAdapter(getActivity(), getChildFragmentManager(), imageId));
+        //int[] imageId = {R.drawable.img_6786, R.drawable.img_6787, R.drawable.img_6788, R.drawable.img_6792, R.drawable.img_6797, R.drawable.img_6812, R.drawable.img_6869, R.drawable.img_6870 };
+        return(new SampleAdapter(getActivity(), getChildFragmentManager(), imageIds));
     }
 
     @Override
