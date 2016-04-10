@@ -1,5 +1,6 @@
 package ch.templer.fragments;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -100,17 +101,18 @@ public class TextMessagesFragment extends Fragment {
 
         return (view);
     }
+    int[] colors = new int[]{Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN};
+    int counter = 0;
+    int prevalue = 0;
 
     @Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
 
         Animation anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
-        anim.setRepeatCount(Animation.INFINITE);
+        //anim.setRepeatCount(Animation.INFINITE);
         //anim.setRepeatMode(Animation.RESTART);
         anim.setAnimationListener(new Animation.AnimationListener() {
 
-            int[] colors = new int[]{Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN};
-            int counter = 0;
 
             @Override
             public void onAnimationStart(Animation animation) {
@@ -124,17 +126,45 @@ public class TextMessagesFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                if (counter >= colors.length){
-                    counter = 0;
-                }
-                ObjectAnimator animator = ObjectAnimator.ofInt(layout, "backgroundColor", colors[counter], colors[counter +1 ]).setDuration(3000);
-                animator.setEvaluator(new ArgbEvaluator());
-                animator.start();
-                counter ++;
+                runNextAnimation();
             }
         });
 
         return anim;
+    }
+
+    private void runNextAnimation() {
+        ObjectAnimator animator = ObjectAnimator.ofInt(layout, "backgroundColor", colors[prevalue], colors[counter]).setDuration(3000);
+        animator.setEvaluator(new ArgbEvaluator());
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                prevalue = counter;
+                counter++;
+                if (counter >= colors.length - 1){
+                    counter = 0;
+                    prevalue = 3;
+                }
+                runNextAnimation();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator.start();
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

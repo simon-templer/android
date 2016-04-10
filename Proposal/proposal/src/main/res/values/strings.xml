@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Proposal</string>
     <string name="action_fragments">Fragments</string>
+    <string name="action_maps">Maps Activity</string>
+
 
     <string name="title_activity_fullscreen_main">FullscreenMain</string>
     <string name="dummy_button">Dummy Button</string>
@@ -10,4 +12,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint">Hint</string>
+    <string name="title_activity_map_location">MapLocationActivity</string>
 </resources>

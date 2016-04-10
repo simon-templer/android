@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.templer.activities.R;
+import ch.templer.fragments.MultipleChoiceFragment;
 import ch.templer.model.Message;
+import ch.templer.model.MultipleChoiceModel;
 import ch.templer.model.PictureSlideshowModel;
+import ch.templer.model.QuestionAndAnswers;
 import ch.templer.model.TextMessagesModel;
 
 /**
@@ -29,6 +32,17 @@ public class TestData {
     }
 
     private void generateTestData() {
+
+        MultipleChoiceModel multipleChoiceModel = new MultipleChoiceModel();
+        List<QuestionAndAnswers> questionAndAnswerses = new ArrayList<>();
+        ArrayList<String> answers = new ArrayList<String>();
+        answers.add("Text Message 1");
+        answers.add("Text Message 2");
+        answers.add("Text Message 3");
+        answers.add("Text Message 4");
+        QuestionAndAnswers questionAndAnswers = QuestionAndAnswers.build().setQuestion("Question 1").setAnswers(answers).build();
+        multipleChoiceModel.setQAndA(questionAndAnswers);
+        this.messages.add(multipleChoiceModel);
 
         PictureSlideshowModel pictureSlideshowModel = new PictureSlideshowModel();
         int[] imageIds = {R.drawable.img_6786, R.drawable.img_6787, R.drawable.img_6788, R.drawable.img_6792, R.drawable.img_6797, R.drawable.img_6812, R.drawable.img_6869, R.drawable.img_6870 };

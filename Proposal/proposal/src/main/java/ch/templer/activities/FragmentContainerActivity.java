@@ -2,28 +2,36 @@ package ch.templer.activities;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.List;
 
 import ch.templer.data.TestData;
+import ch.templer.fragments.MapLocationFragment;
+import ch.templer.fragments.MultipleChoiceFragment;
 import ch.templer.fragments.PictureSlideshowFragment;
 import ch.templer.fragments.TextMessagesFragment;
 import ch.templer.fragments.VideoFragment;
 import ch.templer.model.Message;
-import ch.templer.model.PictureSlideshowModel;
-import ch.templer.model.TextMessagesModel;
-import ch.templer.model.VideoModel;
 
-public class FragmentContainerActivity extends FragmentActivity implements PictureSlideshowFragment.OnFragmentInteractionListener, VideoFragment.OnFragmentInteractionListener, TextMessagesFragment.OnFragmentInteractionListener, View.OnClickListener {
+public class FragmentContainerActivity extends FragmentActivity implements PictureSlideshowFragment.OnFragmentInteractionListener, VideoFragment.OnFragmentInteractionListener, TextMessagesFragment.OnFragmentInteractionListener, MultipleChoiceFragment.OnFragmentInteractionListener, MapLocationFragment.OnFragmentInteractionListener, View.OnClickListener, OnMapReadyCallback {
 
     private List<Message> messages;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,25 +66,46 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 
-        if (message instanceof PictureSlideshowModel) {
-            PictureSlideshowFragment pictureSlideshowFragment = PictureSlideshowFragment.newInstance((PictureSlideshowModel) message);
-            transaction.replace(R.id.fragment_container, pictureSlideshowFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        } else if (message instanceof TextMessagesModel) {
-            TextMessagesFragment textMessage = TextMessagesFragment.newInstance((TextMessagesModel) message);
-            transaction.replace(R.id.fragment_container, textMessage);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        } else if (message instanceof VideoModel) {
-            VideoFragment newFragment1 = new VideoFragment();
-            Bundle args = new Bundle();
-            args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
-            newFragment1.setArguments(args);
-            transaction.replace(R.id.fragment_container, newFragment1);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        }
+//        FragmentManager fm = this.getSupportFragmentManager();
+//        SupportMapFragment fragment = (SupportMapFragment) fm.findFragmentById(R.id.fragment_container);
+//        if (fragment == null) {
+//            fragment = SupportMapFragment.newInstance();
+//            fragment.getMapAsync(this);
+//            fm.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+//        }
+
+        MapLocationFragment fragment = new MapLocationFragment();
+        FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
+        ft2.replace(R.id.fragment_container, fragment)
+                .commit();
+
+
+
+//
+//        if (message instanceof PictureSlideshowModel) {
+//            PictureSlideshowFragment pictureSlideshowFragment = PictureSlideshowFragment.newInstance((PictureSlideshowModel) message);
+//            transaction.replace(R.id.fragment_container, pictureSlideshowFragment);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//        } else if (message instanceof TextMessagesModel) {
+//            TextMessagesFragment textMessage = TextMessagesFragment.newInstance((TextMessagesModel) message);
+//            transaction.replace(R.id.fragment_container, textMessage);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//        } else if (message instanceof VideoModel) {
+//            VideoFragment newFragment1 = new VideoFragment();
+//            Bundle args = new Bundle();
+//            args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
+//            newFragment1.setArguments(args);
+//            transaction.replace(R.id.fragment_container, newFragment1);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//        } else if (message instanceof MultipleChoiceModel) {
+//            MultipleChoiceFragment multipleChoiceFragment = MultipleChoiceFragment.newInstance((MultipleChoiceModel)message);
+//            transaction.replace(R.id.fragment_container, multipleChoiceFragment);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//        }
     }
 
     @Override
@@ -104,6 +133,16 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
         this.messages.remove(0);
 
         processMessage(message);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Add a marker in Sydney, Australia, and move the camera.
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     //  @Override
