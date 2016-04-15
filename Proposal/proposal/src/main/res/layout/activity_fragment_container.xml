@@ -21,21 +21,21 @@
     </RelativeLayout>
 
 
-    <RelativeLayout
-        android:id="@+id/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="bottom">
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/header"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:gravity="bottom">-->
 
-        <Button
-            android:id="@+id/next_fragment_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center|bottom"
-            android:text="NextFragment" />
+        <!--<Button-->
+            <!--android:id="@+id/next_fragment_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center|bottom"-->
+            <!--android:text="NextFragment" />-->
 
-    </RelativeLayout>
+    <!--</RelativeLayout>-->
 
 
 </android.support.design.widget.CoordinatorLayout>

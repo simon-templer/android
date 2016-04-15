@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.templer.activities.R;
 import ch.templer.fragments.MultipleChoiceFragment;
+import ch.templer.model.MapLocationModel;
 import ch.templer.model.Message;
 import ch.templer.model.MultipleChoiceModel;
 import ch.templer.model.PictureSlideshowModel;
@@ -32,6 +33,14 @@ public class TestData {
     }
 
     private void generateTestData() {
+
+        MapLocationModel mapLocationModel = new MapLocationModel();
+        mapLocationModel.setLatitude(46.979631);
+        mapLocationModel.setLongitude(7.456857);
+        mapLocationModel.setRadius(10);
+        mapLocationModel.setMinDistance(2);
+        mapLocationModel.setTimeInterval(2000);
+        this.messages.add(mapLocationModel);
 
         MultipleChoiceModel multipleChoiceModel = new MultipleChoiceModel();
         List<QuestionAndAnswers> questionAndAnswerses = new ArrayList<>();

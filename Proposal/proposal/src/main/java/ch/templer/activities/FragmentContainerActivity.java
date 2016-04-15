@@ -3,6 +3,7 @@ package ch.templer.activities;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.Window;
@@ -11,7 +12,9 @@ import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -24,6 +27,7 @@ import ch.templer.fragments.MultipleChoiceFragment;
 import ch.templer.fragments.PictureSlideshowFragment;
 import ch.templer.fragments.TextMessagesFragment;
 import ch.templer.fragments.VideoFragment;
+import ch.templer.model.MapLocationModel;
 import ch.templer.model.Message;
 import ch.templer.model.MultipleChoiceModel;
 import ch.templer.model.PictureSlideshowModel;
@@ -55,8 +59,8 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
                     .add(R.id.fragment_container, firstFragment).commit();
         }
 
-        Button nextFragmentButton = (Button) findViewById(R.id.next_fragment_button);
-        nextFragmentButton.setOnClickListener(this);
+//        Button nextFragmentButton = (Button) findViewById(R.id.next_fragment_button);
+//        nextFragmentButton.setOnClickListener(this);
 
         messages = TestData.getInstance().getMessages();
         Message message = messages.get(0);
@@ -99,6 +103,9 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
         } else if (message instanceof MultipleChoiceModel) {
             MultipleChoiceFragment multipleChoiceFragment = MultipleChoiceFragment.newInstance((MultipleChoiceModel) message);
             transaction.replace(R.id.fragment_container, multipleChoiceFragment);
+        }else if(message instanceof MapLocationModel){
+            MapLocationFragment fragment = MapLocationFragment.newInstance((MapLocationModel)message);
+            transaction.replace(R.id.fragment_container, fragment);
         }
         transaction.commit();
     }
@@ -117,6 +124,7 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
                             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
     }
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {
