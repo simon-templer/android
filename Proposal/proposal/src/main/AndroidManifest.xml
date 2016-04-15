@@ -27,13 +27,17 @@
             android:name=".FragmentContainerActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <uses-library android:name="com.google.android.maps" />
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDnmsHZgwosGCDiwt25vjd84N-EleZasvM" />
+
         <permission
             android:name="com.example.mapdemo.permission.MAPS_RECEIVE"
             android:protectionLevel="signature" />
+
     </application>
 
 </manifest>

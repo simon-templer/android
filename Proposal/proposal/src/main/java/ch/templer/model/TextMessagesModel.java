@@ -8,7 +8,9 @@ import java.util.List;
  */
 public class TextMessagesModel extends Message {
     private ArrayList<String> messages;
-    private int showTime;
+    private int textViewShowTime;
+    private int backgrountColorTransitionTime;
+    private int textAnimationDuration;
 
     public ArrayList<String> getMessages() {
         return messages;
@@ -18,11 +20,28 @@ public class TextMessagesModel extends Message {
         this.messages = messages;
     }
 
-    public int getShowTime() {
-        return showTime;
+    public int getTextViewShowTime() {
+        return textViewShowTime;
     }
 
-    public void setShowTime(int showTime) {
-        this.showTime = showTime;
+    public void setTextViewShowTime(int textViewShowTime) {
+        this.textViewShowTime = textViewShowTime;
+    }
+
+    public void setBackgrountColorTransitionTime(int backgrountColorTransitionTime) {
+        this.backgrountColorTransitionTime = backgrountColorTransitionTime;
+    }
+
+
+    public int getBackgrountColorTransitionTime() {
+        return backgrountColorTransitionTime;
+    }
+
+    public int getTextAnimationDuration() {
+        return textAnimationDuration;
+    }
+
+    public void setTextAnimationDuration(int textAnimationDuration) {
+        this.textAnimationDuration = textAnimationDuration;
     }
 }

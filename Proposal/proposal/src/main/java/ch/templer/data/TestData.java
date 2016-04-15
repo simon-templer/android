@@ -44,20 +44,26 @@ public class TestData {
         multipleChoiceModel.setQAndA(questionAndAnswers);
         this.messages.add(multipleChoiceModel);
 
+        TextMessagesModel textMessagesModel = new TextMessagesModel();
+        ArrayList<String> texts = new ArrayList<String>();
+        texts.add("Hallo Mein Schatz");
+        texts.add("Ich wollte dir einmal mein neues Handy präsentieren!");
+        texts.add("Wie gefäält es dir?");
+        texts.add("Ich dachte, dich auf eine kleine Reise zu nehmen...");
+        texts.add("Ich möchte dir einiges zeigen und hoffe das du etwas Zeit hast");
+        texts.add("auf gehts...");
+        textMessagesModel.setMessages(texts);
+        textMessagesModel.setTextViewShowTime(3000);
+        textMessagesModel.setBackgrountColorTransitionTime(3000);
+        textMessagesModel.setTextAnimationDuration(3000);
+        this.messages.add(textMessagesModel);
+
+
+
         PictureSlideshowModel pictureSlideshowModel = new PictureSlideshowModel();
         int[] imageIds = {R.drawable.img_6786, R.drawable.img_6787, R.drawable.img_6788, R.drawable.img_6792, R.drawable.img_6797, R.drawable.img_6812, R.drawable.img_6869, R.drawable.img_6870 };
         pictureSlideshowModel.setImageIDs(imageIds);
         this.messages.add(pictureSlideshowModel);
-
-        TextMessagesModel textMessagesModel = new TextMessagesModel();
-        ArrayList<String> texts = new ArrayList<String>();
-        texts.add("Text Message 1");
-        texts.add("Text Message 2");
-        texts.add("Text Message 3");
-        texts.add("Text Message 4");
-        textMessagesModel.setMessages(texts);
-        textMessagesModel.setShowTime(3000);
-        this.messages.add(textMessagesModel);
     }
 
     public List<Message> getMessages() {
