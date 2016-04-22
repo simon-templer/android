@@ -1,0 +1,27 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/TextMessageFragment_FrameLayout"
+    tools:context="ch.templer.fragments.TextMessagesFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/text_messages_fragment_content_textview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|center_horizontal"
+        android:textSize="25dp"
+        android:layout_gravity="center"
+        android:textColor="#ffffff" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_media_next"
+        layout_behavior="com.support.android.designlibdemo.ScrollAwareFABBehavior"/>
+
+</FrameLayout>
