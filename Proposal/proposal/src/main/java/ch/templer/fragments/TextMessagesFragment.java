@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import ch.FragmentFinishedListener;
 import ch.templer.activities.R;
+import ch.templer.animation.AnimationFinishedListener;
 import ch.templer.animation.ColorTransitionAnimation;
 import ch.templer.animation.TextFadeInOutAnimation;
 import ch.templer.model.TextMessagesModel;
@@ -30,14 +32,14 @@ import ch.templer.utils.Colors;
  * Use the {@link TextMessagesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TextMessagesFragment extends Fragment {
+public class TextMessagesFragment extends Fragment implements AnimationFinishedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String TEXT_MESSAGES_ID = "textMessageID";
     private static final String BACKGROUND_COLOR_TRANSITION_TIME_ID = "BACKGROUND_COLOR_TRANSITION_TIME_ID";
     private static final String TEXT_VIEW_SHOW_TIME_ID = "BACKGROUND_COLOR_TRANSITION_TIME_ID";
     private static final String ANIMATION_DURATION_ID = "BACKGROUND_COLOR_TRANSITION_TIME_ID";
-    private FrameLayout layout;
+    private FrameLayout frameLayout;
     private TextView content;
     private FloatingActionButton floatingActionButton;
     private FragmentFinishedListener fragmentFinishedListener;
@@ -46,6 +48,8 @@ public class TextMessagesFragment extends Fragment {
     private int backgroundColorTransitionTime;
     private int textViewShowTime;
     private int animationDuration;
+    private ColorTransitionAnimation colorTransitionAnimation;
+    private TextFadeInOutAnimation textFadeInOutAnimation;
 
     private OnFragmentInteractionListener mListener;
 
@@ -84,17 +88,22 @@ public class TextMessagesFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_text_messages, container, false);
-        layout = (FrameLayout) view.findViewById(R.id.TextMessageFragment_FrameLayout);
-        layout.setBackgroundColor(colors[0]);
+        frameLayout = (FrameLayout) view.findViewById(R.id.TextMessageFragment_FrameLayout);
+        frameLayout.setBackgroundColor(colors[0]);
         content = (TextView) view.findViewById(R.id.text_messages_fragment_content_textview);
         floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragmentFinishedListener.onFragmentFinished();
+                if (fragmentFinishedListener != null) {
+                    fragmentFinishedListener.onFragmentFinished();
+                }
             }
         });
         floatingActionButton.setVisibility(View.INVISIBLE);
+        colorTransitionAnimation = new ColorTransitionAnimation(frameLayout, colors, backgroundColorTransitionTime);
+        textFadeInOutAnimation = new TextFadeInOutAnimation(textMessages, content, textViewShowTime, animationDuration);
+        textFadeInOutAnimation.setAnimationFinishedListener(this);
 
         return (view);
     }
@@ -118,18 +127,12 @@ public class TextMessagesFragment extends Fragment {
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    ColorTransitionAnimation colorTransitionAnimation = new ColorTransitionAnimation(layout, colors, backgroundColorTransitionTime);
-                    colorTransitionAnimation.runAnimation();
-
-                    TextFadeInOutAnimation textFadeInOutAnimation = new TextFadeInOutAnimation(textMessages, content, textViewShowTime, animationDuration);
+                    //colorTransitionAnimation.runAnimation();
                     textFadeInOutAnimation.runAnimation();
                 }
             });
-        }else{
-            ColorTransitionAnimation colorTransitionAnimation = new ColorTransitionAnimation(layout, colors, backgroundColorTransitionTime);
-            colorTransitionAnimation.runAnimation();
-
-            TextFadeInOutAnimation textFadeInOutAnimation = new TextFadeInOutAnimation(textMessages, content, textViewShowTime, animationDuration);
+        } else {
+            //colorTransitionAnimation.runAnimation();
             textFadeInOutAnimation.runAnimation();
         }
 
@@ -157,6 +160,14 @@ public class TextMessagesFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onAnimationFinished() {
+        Animation fadeInAnimation = new AlphaAnimation(0.0f, 1.0f);
+        fadeInAnimation.setDuration(animationDuration);
+        floatingActionButton.setVisibility(View.VISIBLE);
+        floatingActionButton.startAnimation(fadeInAnimation);
     }
 
     public interface OnFragmentInteractionListener {

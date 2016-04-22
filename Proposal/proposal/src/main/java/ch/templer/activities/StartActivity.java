@@ -24,6 +24,9 @@ public class StartActivity extends AppCompatActivity implements LocationService.
     private EditText coordinateContainer;
     private double longitude = 7.437491;
     private double latitude = 46.947213;
+    private double testlongitude = 8.943513;
+    private double testlatitude = 48.659346;
+
     //radius in meters
     private int radius = 100;
 
@@ -89,6 +92,10 @@ public class StartActivity extends AppCompatActivity implements LocationService.
         if (id == R.id.action_fragments) {
             Intent intent = new Intent(this, FragmentContainerActivity.class);
             startActivity(intent);
+
+//            final Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse("http://maps.google.com/maps?" + "saddr="+ testlatitude + "," + testlongitude + "&daddr=" + latitude + "," + longitude));
+//            intent.setClassName("com.google.android.apps.maps","com.google.android.maps.MapsActivity");
+//            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

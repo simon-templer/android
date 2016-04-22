@@ -30,6 +30,14 @@
 
         <uses-library android:name="com.google.android.maps" />
 
+        <activity android:name=".SingleChildActivity"
+            android:label="SingleChildActivity"
+            />
+
+        <activity android:name=".FragmentSampleActivity"
+            android:label="FragmentActivity"
+            />
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDnmsHZgwosGCDiwt25vjd84N-EleZasvM" />

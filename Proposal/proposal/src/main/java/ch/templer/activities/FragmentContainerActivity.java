@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 
 import ch.FragmentFinishedListener;
+import ch.templer.animation.RevealLayout;
 import ch.templer.data.TestData;
 import ch.templer.fragments.MapLocationFragment;
 import ch.templer.fragments.MultipleChoiceFragment;
@@ -38,6 +39,7 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
 
     private List<Message> messages;
     private GoogleMap mMap;
+    private RevealLayout revealLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,8 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_fragment_container);
+        revealLayout = (RevealLayout) findViewById(R.id.reveal_layout);
+       // revealLayout.show();
 
         if (findViewById(R.id.fragment_container) != null) {
             if (savedInstanceState != null) {
@@ -59,9 +63,16 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
                     .add(R.id.fragment_container, firstFragment).commit();
         }
 
-//        Button nextFragmentButton = (Button) findViewById(R.id.next_fragment_button);
-//        nextFragmentButton.setOnClickListener(this);
+        Button nextFragmentButton = (Button) findViewById(R.id.next_fragment_button);
+        nextFragmentButton.setOnClickListener(this);
 
+
+//        revealLayout.postDelayed(new Runnable() {
+//                @Override
+//            public void run() {
+//                    revealLayout.hide();
+//            }
+//        }, 3000);
         messages = TestData.getInstance().getMessages();
         Message message = messages.get(0);
         messages.remove(0);
@@ -70,7 +81,7 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
 
     private void processMessage(Message message) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        //transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 
 //        FragmentManager fm = this.getSupportFragmentManager();
 //        SupportMapFragment fragment = (SupportMapFragment) fm.findFragmentById(R.id.fragment_container);
@@ -137,6 +148,24 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
         this.messages.remove(0);
 
         processMessage(message);
+        if (revealLayout.isContentShown()) {
+            revealLayout.next(2000);
+//            revealLayout.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    revealLayout.show(2000);
+//                }
+//            }, 3000);
+        } else {
+            revealLayout.next(2000);
+//            revealLayout.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    revealLayout.hide(2000);
+//                }
+//            }, 3000);
+        }
+
     }
 
     @Override
@@ -150,10 +179,12 @@ public class FragmentContainerActivity extends FragmentActivity implements Pictu
     }
 
     @Override
-    public void onFragmentFinished() {
+    public void onFragmentFinished()  {
+        revealLayout.hide();
         Message message = this.messages.get(0);
         this.messages.remove(0);
-        processMessage(message);
+        //processMessage(message);
+        //revealLayout.show();
     }
 
     //  @Override

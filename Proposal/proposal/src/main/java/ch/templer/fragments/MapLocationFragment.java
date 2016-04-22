@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import ch.templer.activities.R;
 import ch.templer.location.LocationService;
 import ch.templer.model.MapLocationModel;
+import ch.templer.navigation.Navigator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -140,10 +141,17 @@ public class MapLocationFragment extends SupportMapFragment implements OnMapRead
     @Override
     public void onLocationChanged(Location location) {
         if (mMap != null){
-            if (currentPostitionMarker != null) {
-                currentPostitionMarker.remove();
-            }
-            currentPostitionMarker = moveMarker(location);
+//            if (currentPostitionMarker != null) {
+//                currentPostitionMarker.remove();
+//            }
+//            currentPostitionMarker = moveMarker(location);
+
+            LatLng testdestinationCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
+            LatLng destinationCoordinates = new LatLng(destinationLatitude, destinationLongitute);
+            Navigator nav = new Navigator(mMap,testdestinationCoordinates,destinationCoordinates);
+            //nav.setMode(1,System.currentTimeMillis(),0);
+            nav.findDirections(false);
+
             mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
             mMap.animateCamera(CameraUpdateFactory.zoomIn());
             mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
@@ -154,7 +162,7 @@ public class MapLocationFragment extends SupportMapFragment implements OnMapRead
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.title("CurrentPosition");
         markerOptions.snippet("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_postition_icon));
+//        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_postition_icon));
         LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
         markerOptions.position(currentPosition);
         currentPostitionMarker = mMap.addMarker(markerOptions);
