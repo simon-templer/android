@@ -1,36 +1,45 @@
 package ch.templer.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.Toast;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import ch.templer.activities.R;
+import ch.templer.animation.FloatingActionButtonTransitionAnimation;
 import ch.templer.animation.ViewAppearAnimation;
+import ch.templer.animation.reveallayout.RevealLayout;
+import ch.templer.fragments.service.FragmentTransactionProcessingService;
 import ch.templer.location.LocationService;
 import ch.templer.model.MapLocationModel;
 import ch.templer.navigation.Navigator;
-import ch.templer.utils.Colors;
 
-public class MapLocationFragment extends SupportMapFragment implements OnMapReadyCallback, LocationService.LocationChangedListener, LocationService.LocationReachedListener {
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link MapFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link MapFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String DESTINATION_LONGITUTE = "DESTINATION_LONGITUTE";
     private static final String DESTINATION_LATITUDE = "DESTINATION_LATITUDE";
     private static final String VALIDATION_RADIUS = "VALIDATION_RADIUS";
@@ -56,14 +65,18 @@ public class MapLocationFragment extends SupportMapFragment implements OnMapRead
     private Marker currentPostitionMarker;
     private Marker destinationMarker;
 
+    private FloatingActionButton floatingActionButton;
+    private View mRevealView;
+    private RevealLayout mRevealLayout;
+
     private OnFragmentInteractionListener mListener;
 
-    public MapLocationFragment() {
+    public MapFragment() {
         // Required empty public constructor
     }
 
-    public static MapLocationFragment newInstance(MapLocationModel mapLocationModel) {
-        MapLocationFragment fragment = new MapLocationFragment();
+    public static MapFragment newInstance(MapLocationModel mapLocationModel) {
+        MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
         args.putDouble(DESTINATION_LONGITUTE, mapLocationModel.getLongitude());
         args.putDouble(DESTINATION_LATITUDE, mapLocationModel.getLatitude());
@@ -88,12 +101,29 @@ public class MapLocationFragment extends SupportMapFragment implements OnMapRead
             backgroundColor  = getArguments().getInt(BACKGROUND_COLOR_ID);
             nextFragmentBackgroundColor =  getArguments().getInt(NEXT_FRAGMENT_BACKGROUND_COLOR_ID);
         }
+    }
 
-        locationService = new LocationService(this.getContext(), timeInterval, minDistance);
-        locationService.setLocationChangedListener(this);
-        locationService.setLocationReachedListener(this, destinationLongitute, destinationLatitude, validationRadius);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
+        mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
+        mRevealView = view.findViewById(R.id.reveal_view);
+        mRevealView.setBackgroundColor(nextFragmentBackgroundColor);
 
-        this.getMapAsync(this);
+        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+
+        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton,mRevealView, mRevealLayout, transaction);
+        floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);
+
+        return view;
+    }
+
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
     }
 
     @Override
@@ -115,7 +145,6 @@ public class MapLocationFragment extends SupportMapFragment implements OnMapRead
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        this.getView().setBackgroundColor(Colors.Emerald);
         mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
@@ -132,45 +161,7 @@ public class MapLocationFragment extends SupportMapFragment implements OnMapRead
     }
 
 
-    @Override
-    public void onLocationChanged(Location location) {
-        if (mMap != null){
-//            if (currentPostitionMarker != null) {
-//                currentPostitionMarker.remove();
-//            }
-//            currentPostitionMarker = moveMarker(location);
-
-            LatLng testdestinationCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
-            LatLng destinationCoordinates = new LatLng(destinationLatitude, destinationLongitute);
-            Navigator nav = new Navigator(mMap,testdestinationCoordinates,destinationCoordinates);
-            //nav.setMode(1,System.currentTimeMillis(),0);
-            nav.findDirections(false);
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
-            mMap.animateCamera(CameraUpdateFactory.zoomIn());
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-        }
-    }
-
-    private Marker moveMarker(Location location) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.title("CurrentPosition");
-        markerOptions.snippet("Current Position");
-//        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_postition_icon));
-        LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
-        markerOptions.position(currentPosition);
-        currentPostitionMarker = mMap.addMarker(markerOptions);
-        return currentPostitionMarker;
-    }
-
-    @Override
-    public void onLocationReached(Location location) {
-        String msg = location.getLatitude() + ", " + location.getLongitude();
-        Toast.makeText(this.getContext(), "Location reached event", Toast.LENGTH_LONG).show();
-    }
-
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

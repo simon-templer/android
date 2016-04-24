@@ -1,11 +1,9 @@
 package ch.templer.model;
 
-import java.util.List;
-
 /**
  * Created by Templer on 4/8/2016.
  */
-public class MultipleChoiceModel extends Message {
+public class MultipleChoiceModel extends MessageData {
 
     QuestionAndAnswers QAndA;
 

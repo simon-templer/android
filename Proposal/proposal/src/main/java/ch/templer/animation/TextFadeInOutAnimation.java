@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ch.templer.animation.listener.AnimationFinishedListener;
+
 /**
  * Created by Templer on 4/14/2016.
  */
@@ -20,6 +22,7 @@ public class TextFadeInOutAnimation {
     private int fadeCount;
     private int textViewShowTime;
     private int animationDuration;
+    private AnimationFinishedListener animationFinishedListener;
 
     public TextFadeInOutAnimation(List<String> textMessages, TextView textView, int textViewShowTime, int animationDuration){
         this.textMessages = textMessages;
@@ -41,8 +44,9 @@ public class TextFadeInOutAnimation {
                 fadeCount++;
                 if (fadeCount >= textMessages.size()) {
                     textView.setText("");
-//                    floatingActionButton.setVisibility(View.VISIBLE);
-//                    floatingActionButton.startAnimation(fadeInAnimation);
+                    if (animationFinishedListener != null){
+                        animationFinishedListener.onAnimationFinished();
+                    }
                     return;
                 }
                 textView.setText(textMessages.get(fadeCount));
@@ -84,5 +88,7 @@ public class TextFadeInOutAnimation {
         }
     };
 
-
+    public void setAnimationFinishedListener(AnimationFinishedListener animationFinishedListener) {
+        this.animationFinishedListener = animationFinishedListener;
+    }
 }

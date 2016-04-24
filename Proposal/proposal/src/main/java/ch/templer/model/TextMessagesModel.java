@@ -1,16 +1,18 @@
 package ch.templer.model;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import ch.templer.utils.Colors;
 
 /**
  * Created by Templer on 04.04.2016.
  */
-public class TextMessagesModel extends Message {
+public class TextMessagesModel extends MessageData {
     private ArrayList<String> messages;
     private int textViewShowTime;
     private int backgrountColorTransitionTime;
     private int textAnimationDuration;
+    private int[] backgroundAnimationColors;
 
     public ArrayList<String> getMessages() {
         return messages;
@@ -32,7 +34,6 @@ public class TextMessagesModel extends Message {
         this.backgrountColorTransitionTime = backgrountColorTransitionTime;
     }
 
-
     public int getBackgrountColorTransitionTime() {
         return backgrountColorTransitionTime;
     }
@@ -43,5 +44,13 @@ public class TextMessagesModel extends Message {
 
     public void setTextAnimationDuration(int textAnimationDuration) {
         this.textAnimationDuration = textAnimationDuration;
+    }
+
+    public int[] getBackgroundAnimationColors() {
+        return backgroundAnimationColors;
+    }
+
+    public void setBackgroundAnimationColors(int[] backgroundAnimationColors) {
+        this.backgroundAnimationColors = backgroundAnimationColors;
     }
 }
