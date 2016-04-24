@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ch.templer.animation.listener.AnimationFinishedListener;
+
 /**
  * Created by Templer on 4/14/2016.
  */

@@ -1,4 +1,4 @@
-package ch.templer.animation;
+package ch.templer.animation.reveallayout;
 
 import android.view.animation.Interpolator;
 

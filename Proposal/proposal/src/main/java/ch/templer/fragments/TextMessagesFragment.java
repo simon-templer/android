@@ -5,10 +5,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -16,34 +16,27 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ch.FragmentFinishedListener;
 import ch.templer.activities.R;
-import ch.templer.animation.AnimationFinishedListener;
+import ch.templer.animation.listener.AnimationFinishedListener;
 import ch.templer.animation.ColorTransitionAnimation;
+import ch.templer.animation.FloatingActionButtonTransitionAnimation;
+import ch.templer.animation.reveallayout.RevealLayout;
 import ch.templer.animation.TextFadeInOutAnimation;
+import ch.templer.animation.ViewAppearAnimation;
+import ch.templer.fragments.service.FragmentTransactionProcessingService;
 import ch.templer.model.TextMessagesModel;
-import ch.templer.utils.Colors;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link TextMessagesFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link TextMessagesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class TextMessagesFragment extends Fragment implements AnimationFinishedListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
+public class TextMessagesFragment extends AbstractFragment implements AnimationFinishedListener {
     private static final String TEXT_MESSAGES_ID = "textMessageID";
     private static final String BACKGROUND_COLOR_TRANSITION_TIME_ID = "BACKGROUND_COLOR_TRANSITION_TIME_ID";
     private static final String TEXT_VIEW_SHOW_TIME_ID = "BACKGROUND_COLOR_TRANSITION_TIME_ID";
     private static final String ANIMATION_DURATION_ID = "BACKGROUND_COLOR_TRANSITION_TIME_ID";
+    private static final String BACKGROUND_COLOR_ID = "BACKGROUND_COLOR_ID";
+    private static final String NEXT_FRAGMENT_BACKGROUND_COLOR_ID = "NEXT_FRAGMENT_BACKGROUND_COLOR_ID";
+    private static final String BACKGROUND_ANIMATION_COLORS_ID = "BACKGROUND_ANIMATION_COLORS_ID";
     private FrameLayout frameLayout;
     private TextView content;
-    private FloatingActionButton floatingActionButton;
-    private FragmentFinishedListener fragmentFinishedListener;
-    private int[] colors = new int[]{Colors.Emerald, Colors.Indigo, Colors.Crimson, Colors.Yellow, Colors.Mauve};
     private List<String> textMessages;
     private int backgroundColorTransitionTime;
     private int textViewShowTime;
@@ -51,11 +44,16 @@ public class TextMessagesFragment extends Fragment implements AnimationFinishedL
     private ColorTransitionAnimation colorTransitionAnimation;
     private TextFadeInOutAnimation textFadeInOutAnimation;
 
-    private OnFragmentInteractionListener mListener;
+    int[] backgroundAnimationColors;
+    private int backgroundColor;
+    private int nextFragmentBackgroundColor;
 
-    public void setFragmentFinishedListener(FragmentFinishedListener fragmentFinishedListener) {
-        this.fragmentFinishedListener = fragmentFinishedListener;
-    }
+    private FloatingActionButton floatingActionButton;
+    private View mRevealView;
+    private RevealLayout mRevealLayout;
+
+
+    private OnFragmentInteractionListener mListener;
 
     public TextMessagesFragment() {
         // Required empty public constructor
@@ -68,6 +66,9 @@ public class TextMessagesFragment extends Fragment implements AnimationFinishedL
         args.putInt(BACKGROUND_COLOR_TRANSITION_TIME_ID, textMessagesModel.getBackgrountColorTransitionTime());
         args.putInt(ANIMATION_DURATION_ID, textMessagesModel.getTextAnimationDuration());
         args.putInt(TEXT_VIEW_SHOW_TIME_ID, textMessagesModel.getTextViewShowTime());
+        args.putInt(BACKGROUND_COLOR_ID, textMessagesModel.getBackgroundColor());
+        args.putInt(NEXT_FRAGMENT_BACKGROUND_COLOR_ID, textMessagesModel.getNextFragmentBackroundColor());
+        args.putIntArray(BACKGROUND_ANIMATION_COLORS_ID, textMessagesModel.getBackgroundAnimationColors());
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,30 +81,35 @@ public class TextMessagesFragment extends Fragment implements AnimationFinishedL
             animationDuration = getArguments().getInt(ANIMATION_DURATION_ID);
             backgroundColorTransitionTime = getArguments().getInt(BACKGROUND_COLOR_TRANSITION_TIME_ID);
             textViewShowTime = getArguments().getInt(TEXT_VIEW_SHOW_TIME_ID);
+            backgroundColor  = getArguments().getInt(BACKGROUND_COLOR_ID);
+            nextFragmentBackgroundColor =  getArguments().getInt(NEXT_FRAGMENT_BACKGROUND_COLOR_ID);
+            backgroundAnimationColors = getArguments().getIntArray(BACKGROUND_ANIMATION_COLORS_ID);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_text_messages, container, false);
-        frameLayout = (FrameLayout) view.findViewById(R.id.TextMessageFragment_FrameLayout);
-        frameLayout.setBackgroundColor(colors[0]);
-        content = (TextView) view.findViewById(R.id.text_messages_fragment_content_textview);
+
         floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (fragmentFinishedListener != null) {
-                    fragmentFinishedListener.onFragmentFinished();
-                }
-            }
-        });
         floatingActionButton.setVisibility(View.INVISIBLE);
-        colorTransitionAnimation = new ColorTransitionAnimation(frameLayout, colors, backgroundColorTransitionTime);
+        mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
+        mRevealView = view.findViewById(R.id.reveal_view);
+        mRevealView.setBackgroundColor(nextFragmentBackgroundColor);
+
+        frameLayout = (FrameLayout) view.findViewById(R.id.TextMessageFragment_FrameLayout);
+        frameLayout.setBackgroundColor(backgroundColor);
+        content = (TextView) view.findViewById(R.id.text_messages_fragment_content_textview);
+
+        colorTransitionAnimation = new ColorTransitionAnimation(frameLayout, backgroundAnimationColors, backgroundColorTransitionTime);
         textFadeInOutAnimation = new TextFadeInOutAnimation(textMessages, content, textViewShowTime, animationDuration);
         textFadeInOutAnimation.setAnimationFinishedListener(this);
+
+        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+
+        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton,mRevealView, mRevealLayout, transaction);
+        floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);
 
         return (view);
     }
@@ -127,22 +133,15 @@ public class TextMessagesFragment extends Fragment implements AnimationFinishedL
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    //colorTransitionAnimation.runAnimation();
+                    colorTransitionAnimation.runAnimation();
                     textFadeInOutAnimation.runAnimation();
                 }
             });
         } else {
-            //colorTransitionAnimation.runAnimation();
+            colorTransitionAnimation.runAnimation();
             textFadeInOutAnimation.runAnimation();
         }
-
         return anim;
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -164,10 +163,7 @@ public class TextMessagesFragment extends Fragment implements AnimationFinishedL
 
     @Override
     public void onAnimationFinished() {
-        Animation fadeInAnimation = new AlphaAnimation(0.0f, 1.0f);
-        fadeInAnimation.setDuration(animationDuration);
-        floatingActionButton.setVisibility(View.VISIBLE);
-        floatingActionButton.startAnimation(fadeInAnimation);
+        ViewAppearAnimation.runAnimation(floatingActionButton,animationDuration);
     }
 
     public interface OnFragmentInteractionListener {

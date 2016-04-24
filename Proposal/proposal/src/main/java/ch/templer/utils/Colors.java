@@ -26,4 +26,6 @@ public class Colors {
     public static int Steel = Color.argb(255, 100, 118, 135);
     public static int Mauve = Color.argb(255, 118, 96, 138);
     public static int Taupe = Color.argb(255, 135, 121, 78);
+    public static int Black = Color.argb(255, 0, 0, 0);
+    public static int White = Color.argb(255, 255, 255, 255);
 }

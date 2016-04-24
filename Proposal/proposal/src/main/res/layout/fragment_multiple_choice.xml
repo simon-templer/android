@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.templer.fragments.MultipleChoiceFragment">
+    tools:context="ch.templer.fragments.MultipleChoiceFragment"
+    android:id="@+id/multiple_choice_fragment_frame_layout">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -10,8 +11,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal|top"
-        android:background="#fd0000">
+        android:layout_gravity="center_horizontal|top">
 
         <TextView
             android:layout_width="wrap_content"
@@ -56,5 +56,29 @@
             android:checked="false" />
 
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_media_next"
+        layout_behavior="com.support.android.designlibdemo.ScrollAwareFABBehavior"/>
+
+    <ch.templer.animation.reveallayout.RevealLayout
+        android:id="@+id/reveal_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
+        <View
+            android:id="@+id/reveal_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
+
+    </ch.templer.animation.reveallayout.RevealLayout>
+
 
 </FrameLayout>

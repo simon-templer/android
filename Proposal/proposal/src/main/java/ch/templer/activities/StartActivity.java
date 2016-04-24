@@ -41,24 +41,10 @@ public class StartActivity extends AppCompatActivity implements LocationService.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        if ((ContextCompat.checkSelfPermission((Activity) this,
-//                Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission((Activity) this,
-//                Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED)) {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
-//
-//            } else {
-//                ActivityCompat.requestPermissions((Activity) this,
-//                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-//                        1);
-//            }
-//        } else {
-            locationService = new LocationService(this, 1000, 1);
-            locationService.setLocationChangedListener(this);
-            locationService.setLocationReachedListener(this, longitude, latitude, radius);
-       // }
+        locationService = new LocationService(this, 1000, 1);
+        locationService.setLocationChangedListener(this);
+        locationService.setLocationReachedListener(this, longitude, latitude, radius);
+
         coordinateContainer = (EditText) findViewById(R.id.coordinateContainer);
 
     }
@@ -88,7 +74,6 @@ public class StartActivity extends AppCompatActivity implements LocationService.
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_fragments) {
             Intent intent = new Intent(this, FragmentContainerActivity.class);
             startActivity(intent);

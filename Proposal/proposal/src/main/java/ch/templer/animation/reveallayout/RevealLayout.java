@@ -1,4 +1,4 @@
-package ch.templer.animation;
+package ch.templer.animation.reveallayout;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -23,7 +23,7 @@ public class RevealLayout extends FrameLayout{
     private float mClipRadius = 0;
     private int mClipCenterX, mClipCenterY = 0;
     private Animation mAnimation;
-    private static final int DEFAULT_DURATION = 600;
+    private static final int DEFAULT_DURATION = 1000;
     private boolean mIsContentShown = true;
 
     public RevealLayout(Context context) {
