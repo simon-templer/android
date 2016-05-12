@@ -45,7 +45,6 @@ public class BitmapResizeWorkerTask extends AsyncTask<Integer, Void, Bitmap> {
             }
         }
     }
-
     private int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image

@@ -14,23 +14,24 @@ import android.widget.FrameLayout;
 
 import ch.templer.activities.R;
 import ch.templer.animation.FloatingActionButtonTransitionAnimation;
-import ch.templer.animation.reveallayout.RevealLayout;
 import ch.templer.animation.ViewAppearAnimation;
+import ch.templer.controls.reveallayout.RevealLayout;
+import ch.templer.controls.viewpagger.PhotoViewPagerAdapter;
 import ch.templer.fragments.service.FragmentTransactionProcessingService;
 import ch.templer.model.PictureSlideshowModel;
-import ch.templer.viewpagger.InfinitePagerAdapter;
 import ch.templer.viewpagger.SampleAdapter;
 
 public class PictureSlideshowFragment extends AbstractFragment {
-    private static final String IMAGE_IDS_KEY = "imageIds";
+    private static final String PICTURE_SLIDESHOW_MODEL_ID = "PICTURE_SLIDESHOW_MODEL_ID";
     private static final String BACKGROUND_COLOR_ID = "BACKGROUND_COLOR_ID";
     private static final String NEXT_FRAGMENT_BACKGROUND_COLOR_ID = "NEXT_FRAGMENT_BACKGROUND_COLOR_ID";
-    private final String PLUS_ONE_URL = "http://developer.android.com";
 
-    private int[] imageIds;
+//    private int[] imageIds;
+//
+//    private int backgroundColor;
+//    private int nextFragmentBackgroundColor;
 
-    private int backgroundColor;
-    private int nextFragmentBackgroundColor;
+    private PictureSlideshowModel pictureSlideshowModel;
 
     FrameLayout frameLayout;
 
@@ -47,9 +48,7 @@ public class PictureSlideshowFragment extends AbstractFragment {
     public static PictureSlideshowFragment newInstance(PictureSlideshowModel pictureSlideshowModel) {
         PictureSlideshowFragment fragment = new PictureSlideshowFragment();
         Bundle args = new Bundle();
-        args.putIntArray(IMAGE_IDS_KEY, pictureSlideshowModel.getImageIDs());
-        args.putInt(BACKGROUND_COLOR_ID, pictureSlideshowModel.getBackgroundColor());
-        args.putInt(NEXT_FRAGMENT_BACKGROUND_COLOR_ID, pictureSlideshowModel.getNextFragmentBackroundColor());
+        args.putSerializable(PICTURE_SLIDESHOW_MODEL_ID, pictureSlideshowModel);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,9 +57,7 @@ public class PictureSlideshowFragment extends AbstractFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            imageIds = getArguments().getIntArray(IMAGE_IDS_KEY);
-            backgroundColor  = getArguments().getInt(BACKGROUND_COLOR_ID);
-            nextFragmentBackgroundColor =  getArguments().getInt(NEXT_FRAGMENT_BACKGROUND_COLOR_ID);
+            pictureSlideshowModel = (PictureSlideshowModel) getArguments().getSerializable(PICTURE_SLIDESHOW_MODEL_ID);
         }
     }
 
@@ -69,28 +66,36 @@ public class PictureSlideshowFragment extends AbstractFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.pager, container, false);
-        ViewPager pager=(ViewPager)view.findViewById(R.id.pager);
-        PagerAdapter adapter = new InfinitePagerAdapter(buildAdapter());
-        pager.setAdapter(adapter);
+
+//        ViewPager pager=(ViewPager)view.findViewById(R.id.pager);
+//        //PagerAdapter adapter = new InfinitePagerAdapter(buildAdapter());
+//        PagerAdapter adapter = new InfinitePagerAdapter(imageIds);
+//        pager.setAdapter(adapter);
+
+        ViewPager pager = (ViewPager) view.findViewById(R.id.view_pager);
+
+        pager.setAdapter(new PhotoViewPagerAdapter(pictureSlideshowModel.getImageIDs()));
+
         ViewAppearAnimation.runAnimation(pager, 3000);
 
         floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
         mRevealView = view.findViewById(R.id.reveal_view);
-        mRevealView.setBackgroundColor(nextFragmentBackgroundColor);
+        mRevealView.setBackgroundColor(pictureSlideshowModel.getNextFragmentBackroundColor());
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
 
         frameLayout = (FrameLayout) view.findViewById(R.id.PictureFragment_FrameLayout);
-        frameLayout.setBackgroundColor(backgroundColor);
+        frameLayout.setBackgroundColor(pictureSlideshowModel.getBackgroundColor());
 
         FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
 
-        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton,mRevealView, mRevealLayout, transaction);
+        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton, mRevealView, mRevealLayout, transaction);
         floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);
 
-        return(view);
+        return (view);
     }
+
     private PagerAdapter buildAdapter() {
-        return(new SampleAdapter(getActivity(), getChildFragmentManager(), imageIds));
+        return (new SampleAdapter(getActivity(), getChildFragmentManager(), pictureSlideshowModel.getImageIDs()));
     }
 
     @Override

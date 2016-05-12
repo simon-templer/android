@@ -21,7 +21,7 @@
         android:src="@android:drawable/ic_media_next"
         layout_behavior="com.support.android.designlibdemo.ScrollAwareFABBehavior"/>
 
-    <ch.templer.animation.reveallayout.RevealLayout
+    <ch.templer.controls.reveallayout.RevealLayout
         android:id="@+id/reveal_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,6 +34,6 @@
             android:visibility="invisible"
             android:background="#008A00"/>
 
-    </ch.templer.animation.reveallayout.RevealLayout>
+    </ch.templer.controls.reveallayout.RevealLayout>
 
 </FrameLayout>

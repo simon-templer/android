@@ -1,26 +1,24 @@
 package ch.templer.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Templer on 4/8/2016.
  */
-public class QuestionAndAnswers {
-    private ArrayList<String> answers;
+public class QuestionAndAnswers implements Serializable{
+    private ArrayList<Answer> answers;
     private String Question;
+    private String correctMessage;
+    private String wrongMessage;
 
-    private QuestionAndAnswers(){}
+    public QuestionAndAnswers(){}
 
-    public static Builder build(){
-        return new Builder();
-    }
-
-    public ArrayList<String> getAnswers() {
+    public ArrayList<Answer> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(ArrayList<String> answers) {
+    public void setAnswers(ArrayList<Answer> answers) {
         this.answers = answers;
     }
 
@@ -32,25 +30,19 @@ public class QuestionAndAnswers {
         Question = question;
     }
 
-    public static class Builder {
-        QuestionAndAnswers questionAndAnswers;
+    public String getCorrectMessage() {
+        return correctMessage;
+    }
 
-        public Builder(){
-            questionAndAnswers = new QuestionAndAnswers();
-        }
+    public void setCorrectMessage(String correctMessage) {
+        this.correctMessage = correctMessage;
+    }
 
-        public Builder setQuestion(String question){
-            questionAndAnswers.setQuestion(question);
-            return this;
-        }
+    public String getWrongMessage() {
+        return wrongMessage;
+    }
 
-        public Builder setAnswers(ArrayList<String> answers){
-            questionAndAnswers.setAnswers(answers);
-            return this;
-        }
-
-        public QuestionAndAnswers build() {
-            return questionAndAnswers;
-        }
+    public void setWrongMessage(String wrongMessage) {
+        this.wrongMessage = wrongMessage;
     }
 }

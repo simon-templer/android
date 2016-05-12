@@ -3,20 +3,20 @@ package ch.templer.fragments;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -25,11 +25,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import ch.templer.activities.R;
 import ch.templer.animation.FloatingActionButtonTransitionAnimation;
 import ch.templer.animation.ViewAppearAnimation;
-import ch.templer.animation.reveallayout.RevealLayout;
+import ch.templer.controls.fabtoolbarlayout.FABToolbarLayout;
+import ch.templer.controls.reveallayout.RevealLayout;
 import ch.templer.fragments.service.FragmentTransactionProcessingService;
-import ch.templer.location.LocationService;
+import ch.templer.services.location.LocationService;
 import ch.templer.model.MapLocationModel;
-import ch.templer.navigation.Navigator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,6 +68,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private FloatingActionButton floatingActionButton;
     private View mRevealView;
     private RevealLayout mRevealLayout;
+    private FABToolbarLayout fabToolbarLayout;
+    private Fragment fragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -117,6 +119,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton,mRevealView, mRevealLayout, transaction);
         floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);
 
+//        fabToolbarLayout = (FABToolbarLayout) view.findViewById(R.id.fabtoolbar);
+//        FloatingActionButton fab = (FloatingActionButton)view.findViewById(R.id.fabtoolbar_fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                fabToolbarLayout.show();
+//            }
+//        });
+
+        FragmentManager fragmentManager = getChildFragmentManager();
+
+        SupportMapFragment test = (SupportMapFragment)fragmentManager.findFragmentById(R.id.map);
+
+        test.getMapAsync(this);
+
+
         return view;
     }
 
@@ -146,6 +164,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                fabToolbarLayout.hide();
+            }
+        });
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }

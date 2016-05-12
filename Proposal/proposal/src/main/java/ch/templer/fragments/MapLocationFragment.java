@@ -1,17 +1,12 @@
 package ch.templer.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,11 +18,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import ch.templer.activities.R;
 import ch.templer.animation.ViewAppearAnimation;
-import ch.templer.location.LocationService;
+import ch.templer.services.location.LocationService;
 import ch.templer.model.MapLocationModel;
-import ch.templer.navigation.Navigator;
+import ch.templer.services.navigation.Navigator;
 import ch.templer.utils.Colors;
 
 public class MapLocationFragment extends SupportMapFragment implements OnMapReadyCallback, LocationService.LocationChangedListener, LocationService.LocationReachedListener {

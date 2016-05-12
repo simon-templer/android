@@ -3,18 +3,14 @@ package ch.templer.fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import ch.templer.activities.R;
-import ch.templer.animation.FloatingActionButtonTransitionAnimation;
-import ch.templer.animation.reveallayout.RevealLayout;
-import ch.templer.fragments.service.FragmentTransactionProcessingService;
+import ch.templer.controls.reveallayout.RevealLayout;
 
 /**
  * A simple {@link Fragment} subclass.

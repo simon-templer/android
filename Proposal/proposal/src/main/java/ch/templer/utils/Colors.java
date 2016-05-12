@@ -28,4 +28,6 @@ public class Colors {
     public static int Taupe = Color.argb(255, 135, 121, 78);
     public static int Black = Color.argb(255, 0, 0, 0);
     public static int White = Color.argb(255, 255, 255, 255);
+    public static int ImageSliderBackground = Color.argb(255, 44, 44, 44);
+    //3158064
 }

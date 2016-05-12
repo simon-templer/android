@@ -3,7 +3,6 @@ package ch.templer.activities;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,8 +14,8 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import ch.templer.data.TestData;
-import ch.templer.location.LocationService;
+import ch.templer.model.data.TestData;
+import ch.templer.services.location.LocationService;
 
 public class StartActivity extends AppCompatActivity implements LocationService.LocationChangedListener, LocationService.LocationReachedListener, View.OnClickListener {
 

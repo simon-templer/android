@@ -2,17 +2,16 @@ package ch.templer.model;
 
 import java.util.ArrayList;
 
-import ch.templer.utils.Colors;
-
 /**
  * Created by Templer on 04.04.2016.
  */
-public class TextMessagesModel extends MessageData {
+public class TextMessagesModel extends AbstractMessageModel {
     private ArrayList<String> messages;
     private int textViewShowTime;
     private int backgrountColorTransitionTime;
     private int textAnimationDuration;
     private int[] backgroundAnimationColors;
+    private int backgroundMusicID;
 
     public ArrayList<String> getMessages() {
         return messages;
@@ -34,7 +33,7 @@ public class TextMessagesModel extends MessageData {
         this.backgrountColorTransitionTime = backgrountColorTransitionTime;
     }
 
-    public int getBackgrountColorTransitionTime() {
+    public int getBackgroundColorTransitionTime() {
         return backgrountColorTransitionTime;
     }
 
@@ -52,5 +51,13 @@ public class TextMessagesModel extends MessageData {
 
     public void setBackgroundAnimationColors(int[] backgroundAnimationColors) {
         this.backgroundAnimationColors = backgroundAnimationColors;
+    }
+
+    public int getBackgroundMusicID() {
+        return backgroundMusicID;
+    }
+
+    public void setBackgroundMusicID(int backgroundMusicID) {
+        this.backgroundMusicID = backgroundMusicID;
     }
 }

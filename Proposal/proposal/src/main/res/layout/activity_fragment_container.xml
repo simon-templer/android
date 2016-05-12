@@ -7,7 +7,7 @@
     android:fitsSystemWindows="false"
     tools:context=".FragmentContainerActivity">
 
-    <ch.templer.animation.reveallayout.RevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ch.templer.controls.reveallayout.RevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/reveal_layout"
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"></FrameLayout>
         </RelativeLayout>
-    </ch.templer.animation.reveallayout.RevealLayout>
+    </ch.templer.controls.reveallayout.RevealLayout>
 
     <RelativeLayout
         android:id="@+id/header"

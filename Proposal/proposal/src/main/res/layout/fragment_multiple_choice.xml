@@ -1,72 +1,96 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/CoordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="ch.templer.fragments.MultipleChoiceFragment"
-    android:id="@+id/multiple_choice_fragment_frame_layout">
-
-    <!-- TODO: Update blank fragment layout -->
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/ButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal|top">
+        android:layout_gravity="center_horizontal|top"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!--<LinearLayout-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:id="@+id/topBar"-->
+        <!--android:layout_height="?attr/actionBarSize"-->
+        <!--android:background="?attr/colorPrimary"-->
+        <!--android:elevation="4dp" >-->
+
+        <!--<LinearLayout-->
+        <!--android:orientation="vertical"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+        <!--android:text="Small Text"-->
+        <!--android:id="@+id/textView"-->
+        <!--android:layout_gravity="center_vertical" />-->
+        <!--</LinearLayout>-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+        <!--android:text="Small Text"-->
+        <!--android:id="@+id/correct_answers_text_view"-->
+        <!--android:layout_gravity="bottom" />-->
+
+        <!--</LinearLayout>-->
+
+        <RelativeLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_alignParentTop="true"
+            android:background="#FC9"
+            android:elevation="4dp"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/correct_answers_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Title"
+                android:textColor="#000"
+                android:textSize="20sp"
+                android:layout_gravity="bottom" />
+        </RelativeLayout>
+
+
+        <TextSwitcher
+            android:id="@+id/multiple_choice_fragment_question_text_switcher"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hello_blank_fragment"
             android:layout_gravity="center_horizontal|top"
-            android:id="@+id/multiple_choice_fragment_question_text_view"
-            android:textIsSelectable="false"
-            android:textSize="26dp"
-            android:textStyle="bold" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New RadioButton"
-            android:id="@+id/multiple_choice_fragment_answer_one_radio_button"
-            android:layout_gravity="center_horizontal"
-            android:checked="false" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New RadioButton"
-            android:id="@+id/multiple_choice_fragment_answer_two_radio_button"
-            android:layout_gravity="center_horizontal"
-            android:checked="false" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New RadioButton"
-            android:id="@+id/multiple_choice_fragment_answer_three_radio_button"
-            android:layout_gravity="center_horizontal"
-            android:checked="false" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New RadioButton"
-            android:id="@+id/multiple_choice_fragment_answer_four_radio_button"
-            android:layout_gravity="center_horizontal"
-            android:checked="false" />
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:background="#8c277d8c"
+            android:minHeight="250dp"
+            android:text="@string/hello_blank_fragment"
+            android:textColor="#458e9b"
+            android:textIsSelectable="false" />
 
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingButton"
+        layout_behavior="com.support.android.designlibdemo.ScrollAwareFABBehavior"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_media_next"
-        layout_behavior="com.support.android.designlibdemo.ScrollAwareFABBehavior"/>
+        android:src="@android:drawable/ic_media_next" />
 
-    <ch.templer.animation.reveallayout.RevealLayout
+    <ch.templer.controls.reveallayout.RevealLayout
         android:id="@+id/reveal_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -78,7 +102,6 @@
             android:layout_height="match_parent"
             android:visibility="invisible" />
 
-    </ch.templer.animation.reveallayout.RevealLayout>
+    </ch.templer.controls.reveallayout.RevealLayout>
 
-
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -3,7 +3,7 @@ package ch.templer.model;
 /**
  * Created by Templer on 10.04.2016.
  */
-public class MapLocationModel extends MessageData {
+public class MapLocationModel extends AbstractMessageModel {
 
     private double longitude;
     private double latitude;

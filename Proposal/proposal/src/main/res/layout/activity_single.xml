@@ -1,4 +1,4 @@
-<ch.templer.animation.reveallayout.RevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ch.templer.controls.reveallayout.RevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -15,4 +15,4 @@
         android:textColor="#FFF"
         />
 
-</ch.templer.animation.reveallayout.RevealLayout>
+</ch.templer.controls.reveallayout.RevealLayout>

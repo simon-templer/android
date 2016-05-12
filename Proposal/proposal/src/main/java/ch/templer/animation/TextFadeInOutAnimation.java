@@ -4,10 +4,9 @@ import android.os.Handler;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.TextView;
-
+import ch.templer.controls.listener.AnimationFinishedListener;
 import java.util.List;
 
-import ch.templer.animation.listener.AnimationFinishedListener;
 
 /**
  * Created by Templer on 4/14/2016.
@@ -25,10 +24,25 @@ public class TextFadeInOutAnimation {
     private AnimationFinishedListener animationFinishedListener;
 
     public TextFadeInOutAnimation(List<String> textMessages, TextView textView, int textViewShowTime, int animationDuration){
+        this(textMessages, textView, textViewShowTime, animationDuration, 0);
+    }
+
+    public TextFadeInOutAnimation(List<String> textMessages, TextView textView, int textViewShowTime, int animationDuration, int startPos){
         this.textMessages = textMessages;
         this.textView = textView;
         this.textViewShowTime = textViewShowTime;
         this.animationDuration = animationDuration;
+
+        if (startPos < textMessages.size() && startPos > 0){
+            fadeCount = startPos;
+        }else{
+            fadeCount =0;
+        }
+
+    }
+
+    public int getFadeCount() {
+        return fadeCount;
     }
 
     public void runAnimation() {
@@ -67,8 +81,6 @@ public class TextFadeInOutAnimation {
 
             }
         });
-
-        fadeCount = 0;
 
         handler = new Handler();
 
