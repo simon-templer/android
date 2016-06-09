@@ -4,6 +4,8 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 
+import ch.templer.utils.logging.Logger;
+
 /**
  * Created by Templer on 5/6/2016.
  */
@@ -16,13 +18,18 @@ public class SoundService {
     private static CompletionListener completionListener = new CompletionListener();
     private static boolean isPlayerReleased = true;
     private static int length;
+    private static Logger log = Logger.getLogger();
 
     private static MediaPlayer newMediaPlayerInstance(Context context, int id) {
         if (mediaPlayer != null) {
+            // flag hast to be set, because a seperate thread can call other service methods in the meantime
+            isPlayerReleased = true;
+            log.d("released");
             mediaPlayer.release();
             mediaPlayer = null;
         }
         isPlayerReleased = false;
+        log.d("initalized");
         return MediaPlayer.create(context, id);
     }
 
@@ -105,6 +112,7 @@ public class SoundService {
         public void onCompletion(MediaPlayer mp) {
             mp.release();
             mp = null;
+            log.d("released");
             isPlayerReleased = true;
         }
     }

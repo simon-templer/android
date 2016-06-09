@@ -1,11 +1,14 @@
 package ch.templer.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -23,10 +26,14 @@ import ch.templer.controls.reveallayout.RevealLayout;
 import ch.templer.fragments.service.FragmentTransactionProcessingService;
 import ch.templer.model.TextMessagesModel;
 import ch.templer.services.multimedia.SoundService;
+import io.github.yavski.fabspeeddial.FabSpeedDial;
+import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
 
 public class TextMessagesFragment extends AbstractFragment implements AnimationFinishedListener {
     private static final String TEXT_MESSAGES_MODEL_ID = "textMessageID";
+    private static final String TEXT_MESSAGE_POSITION_ID = "TEXT_MESSAGE_POSITION_ID";
+    private static final String COLOR_TRANSITION_POSITION_ID = "COLOR_TRANSITION_POSITION_ID";
 
     private FrameLayout frameLayout;
     private TextView content;
@@ -35,9 +42,12 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
 
     private TextMessagesModel textMessagesModel;
 
-    private FloatingActionButton floatingActionButton;
+    private FabSpeedDial nextFragmentFab;
+    //private FloatingActionButton restartTextAnimationFab;
     private View mRevealView;
     private RevealLayout mRevealLayout;
+
+    private boolean textAnimationFinished=false;
 
     protected static final class MyNonConfig {
         // fill with public variables keeping references and other state info, set to null
@@ -72,7 +82,8 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("test", textFadeInOutAnimation.getFadeCount());
+        outState.putInt(TEXT_MESSAGE_POSITION_ID, textFadeInOutAnimation.getFadeCount());
+        outState.putInt(COLOR_TRANSITION_POSITION_ID, colorTransitionAnimation.getCurrentPosition());
         outState.putInt("songPosition", SoundService.getSongPosition());
         SoundService.stop();
     }
@@ -82,8 +93,11 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_text_messages, container, false);
 
-        floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
-        floatingActionButton.setVisibility(View.INVISIBLE);
+        nextFragmentFab = (FabSpeedDial) view.findViewById(R.id.fab_speed_dial);
+        nextFragmentFab.setVisibility(View.INVISIBLE);
+//        restartTextAnimationFab = (FloatingActionButton) view.findViewById(R.id.restartTextAnimationFab);
+//        restartTextAnimationFab.setVisibility(View.INVISIBLE);
+//        restartTextAnimationFab.setOnClickListener(this);
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
         mRevealView.setBackgroundColor(textMessagesModel.getNextFragmentBackroundColor());
@@ -92,23 +106,41 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
         frameLayout.setBackgroundColor(textMessagesModel.getBackgroundColor());
         content = (TextView) view.findViewById(R.id.text_messages_fragment_content_textview);
 
-        colorTransitionAnimation = new ColorTransitionAnimation(frameLayout, textMessagesModel.getBackgroundAnimationColors(), textMessagesModel.getBackgroundColorTransitionTime());
-        int testcounter = 0;
+        int currentTextMessagesPosition = 0;
+        int currentColorTransitionPosition = 0;
         int songPosition = 0;
         if (savedInstanceState != null) {
-            testcounter = savedInstanceState.getInt("test");
+            currentTextMessagesPosition = savedInstanceState.getInt(TEXT_MESSAGE_POSITION_ID);
             songPosition = savedInstanceState.getInt("songPosition");
+            currentColorTransitionPosition = savedInstanceState.getInt(COLOR_TRANSITION_POSITION_ID);
         }
-        textFadeInOutAnimation = new TextFadeInOutAnimation(textMessagesModel.getMessages(), content, textMessagesModel.getTextViewShowTime(), textMessagesModel.getTextAnimationDuration(), testcounter);
-        textFadeInOutAnimation.setAnimationFinishedListener(this);
+        if (!textAnimationFinished){
+            textFadeInOutAnimation = new TextFadeInOutAnimation(textMessagesModel.getMessages(), content, textMessagesModel.getTextViewShowTime(), textMessagesModel.getTextAnimationDuration(), currentTextMessagesPosition);
+            textFadeInOutAnimation.setAnimationFinishedListener(this);
+        }
 
-        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+        colorTransitionAnimation = new ColorTransitionAnimation(frameLayout, textMessagesModel.getBackgroundAnimationColors(), textMessagesModel.getBackgroundColorTransitionTime(), currentColorTransitionPosition);
 
-        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton, mRevealView, mRevealLayout, transaction);
-        floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);
+
+        nextFragmentFab.setMenuListener(new SimpleMenuListenerAdapter() {
+            @Override
+            public boolean onMenuItemSelected(MenuItem menuItem) {
+                if ( menuItem.getItemId() == R.id.action_next){
+                    FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+                    FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(nextFragmentFab, mRevealView, mRevealLayout, transaction);
+                    floatingActionButtonAnimationOnClickListener.runAnimation();
+                }else if (menuItem.getItemId() == R.id.action_refresh){
+                    textFadeInOutAnimation = new TextFadeInOutAnimation(textMessagesModel.getMessages(), content, textMessagesModel.getTextViewShowTime(), textMessagesModel.getTextAnimationDuration(), 0);
+                    textFadeInOutAnimation.runAnimation();
+                }
+                return false;
+            }
+
+        });
         if (!SoundService.isPlaying()) {
-            SoundService.playSound(this.getContext(), textMessagesModel.getBackgroundMusicID(),songPosition);
+            SoundService.playSound(this.getContext(), textMessagesModel.getBackgroundMusicID(), songPosition);
         }
+
         return (view);
     }
 
@@ -182,7 +214,9 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
 
     @Override
     public void onAnimationFinished() {
-        ViewAppearAnimation.runAnimation(floatingActionButton, textMessagesModel.getTextAnimationDuration());
+        ViewAppearAnimation.runAnimation(nextFragmentFab, textMessagesModel.getTextAnimationDuration());
+        //ViewAppearAnimation.runAnimation(restartTextAnimationFab, textMessagesModel.getTextAnimationDuration());
+        textAnimationFinished = true;
     }
 
     public interface OnFragmentInteractionListener {

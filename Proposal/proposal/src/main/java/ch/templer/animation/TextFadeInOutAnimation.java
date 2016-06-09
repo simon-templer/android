@@ -33,7 +33,7 @@ public class TextFadeInOutAnimation {
         this.textViewShowTime = textViewShowTime;
         this.animationDuration = animationDuration;
 
-        if (startPos < textMessages.size() && startPos > 0){
+        if (startPos < textMessages.size() && startPos >= 0){
             fadeCount = startPos;
         }else{
             fadeCount =0;

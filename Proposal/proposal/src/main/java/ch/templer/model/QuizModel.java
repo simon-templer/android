@@ -5,10 +5,11 @@ import java.util.List;
 /**
  * Created by Templer on 4/8/2016.
  */
-public class MultipleChoiceModel extends AbstractMessageModel {
+public class QuizModel extends AbstractMessageModel {
 
     private List<QuestionAndAnswers> QAndAs;
     private String title;
+    private int fabAppearAnimationTime;
 
     public List<QuestionAndAnswers> getQAndAs() {
         return QAndAs;
@@ -24,5 +25,13 @@ public class MultipleChoiceModel extends AbstractMessageModel {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getFabAppearAnimationTime() {
+        return fabAppearAnimationTime;
+    }
+
+    public void setFabAppearAnimationTime(int fabAppearAnimationTime) {
+        this.fabAppearAnimationTime = fabAppearAnimationTime;
     }
 }

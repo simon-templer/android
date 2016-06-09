@@ -5,8 +5,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.view.View;
 
-import ch.templer.utils.Colors;
-
 /**
  * Created by Templer on 4/14/2016.
  */
@@ -16,19 +14,30 @@ public class ColorTransitionAnimation {
     private int colorCounter = 0;
     private int duration;
 
-    public ColorTransitionAnimation(View view, int[] colors, int duration){
+    public ColorTransitionAnimation(View view, int[] colors, int duration) {
+        this(view, colors, duration, 0);
+    }
+
+    public ColorTransitionAnimation(View view, int[] colors, int duration, int colorStartPosition) {
         this.view = view;
         this.colors = colors;
         this.duration = duration;
+        if (colorStartPosition >= 0 && colorStartPosition < colors.length) {
+            this.colorCounter = colorStartPosition;
+        }
+    }
+
+    public int getCurrentPosition() {
+        return colorCounter;
     }
 
     public void runAnimation() {
 
         ObjectAnimator animator;
-        if (colorCounter +1 < colors.length){
+        if (colorCounter + 1 < colors.length) {
             animator = ObjectAnimator.ofInt(view, "backgroundColor", colors[colorCounter], colors[colorCounter + 1]).setDuration(duration);
             colorCounter++;
-        }else{
+        } else {
             animator = ObjectAnimator.ofInt(view, "backgroundColor", colors[colorCounter], colors[0]).setDuration(duration);
             colorCounter = 0;
 

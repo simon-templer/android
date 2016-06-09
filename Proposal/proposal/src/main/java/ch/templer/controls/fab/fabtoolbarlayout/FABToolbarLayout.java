@@ -1,4 +1,4 @@
-package ch.templer.controls.fabtoolbarlayout;
+package ch.templer.controls.fab.fabtoolbarlayout;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

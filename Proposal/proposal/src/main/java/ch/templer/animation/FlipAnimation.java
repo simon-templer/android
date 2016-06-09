@@ -10,7 +10,7 @@ import android.view.animation.Transformation;
 /**
  * Created by Templer on 5/6/2016.
  */
-public class FlipAnimation extends Animation {
+public class FlipAnimation extends AbstractAnimation {
     private Camera camera;
 
     private View fromView;
@@ -28,10 +28,28 @@ public class FlipAnimation extends Animation {
      * @param toView   Second view in the transition.
      */
     public FlipAnimation(View fromView, View toView) {
+        this.setAnimationListener(new AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (animationFinishedListener != null){
+                    animationFinishedListener.onAnimationFinished();
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
         this.fromView = fromView;
         this.toView = toView;
 
-        setDuration(700);
+        setDuration(500);
         setFillAfter(false);
         setInterpolator(new AccelerateDecelerateInterpolator());
     }

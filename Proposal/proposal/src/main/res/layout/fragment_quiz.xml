@@ -5,43 +5,10 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/ButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal|top"
         android:orientation="vertical">
-
-        <!--<LinearLayout-->
-        <!--android:orientation="horizontal"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:id="@+id/topBar"-->
-        <!--android:layout_height="?attr/actionBarSize"-->
-        <!--android:background="?attr/colorPrimary"-->
-        <!--android:elevation="4dp" >-->
-
-        <!--<LinearLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-        <!--android:text="Small Text"-->
-        <!--android:id="@+id/textView"-->
-        <!--android:layout_gravity="center_vertical" />-->
-        <!--</LinearLayout>-->
-
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-        <!--android:text="Small Text"-->
-        <!--android:id="@+id/correct_answers_text_view"-->
-        <!--android:layout_gravity="bottom" />-->
-
-        <!--</LinearLayout>-->
 
         <RelativeLayout
             android:id="@+id/topBar"
@@ -79,6 +46,63 @@
             android:textColor="#458e9b"
             android:textIsSelectable="false" />
 
+        <LinearLayout
+            android:id="@+id/ButtonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ch.templer.controls.answerbutton.AnswerButton
+                android:id="@+id/answerOne"
+                android:layout_width="match_parent"
+                android:background="@drawable/button_selector"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="Übernehmen"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="00dp"
+                android:layout_marginBottom="10dp">
+            </ch.templer.controls.answerbutton.AnswerButton>
+            <ch.templer.controls.answerbutton.AnswerButton
+                android:id="@+id/answerTwo"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/button_selector"
+                android:layout_weight="1"
+                android:text="Abbrechen"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp">
+            </ch.templer.controls.answerbutton.AnswerButton>
+            <ch.templer.controls.answerbutton.AnswerButton
+                android:id="@+id/answerThree"
+                android:layout_width="match_parent"
+                android:background="@drawable/button_selector"
+                android:layout_height="50dp"
+                android:layout_weight="1" android:text="Übernehmen"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp">
+            </ch.templer.controls.answerbutton.AnswerButton>
+            <ch.templer.controls.answerbutton.AnswerButton
+                android:id="@+id/answerFour"
+                android:layout_width="match_parent"
+                android:background="@drawable/button_selector"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="Abbrechen"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="55dp">
+            </ch.templer.controls.answerbutton.AnswerButton>
+
+        </LinearLayout>
+
+
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -88,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_media_next" />
+        android:src="@drawable/ic_arrow_forward_24dp" />
 
     <ch.templer.controls.reveallayout.RevealLayout
         android:id="@+id/reveal_layout"

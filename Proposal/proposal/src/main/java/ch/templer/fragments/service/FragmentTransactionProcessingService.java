@@ -6,16 +6,18 @@ import android.support.v4.app.FragmentTransaction;
 import java.util.List;
 
 import ch.templer.activities.R;
+import ch.templer.fragments.SelfieFragment;
 import ch.templer.model.AbstractMessageModel;
+import ch.templer.model.SelfieModel;
 import ch.templer.model.data.TestData;
 import ch.templer.fragments.FinishedFragment;
-import ch.templer.fragments.MapFragment;
-import ch.templer.fragments.quizfragment.MultipleChoiceFragment;
+import ch.templer.fragments.mapfragment.MapFragment;
+import ch.templer.fragments.quizfragment.QuizFragment;
 import ch.templer.fragments.PictureSlideshowFragment;
 import ch.templer.fragments.TextMessagesFragment;
 import ch.templer.fragments.VideoFragment;
 import ch.templer.model.MapLocationModel;
-import ch.templer.model.MultipleChoiceModel;
+import ch.templer.model.QuizModel;
 import ch.templer.model.PictureSlideshowModel;
 import ch.templer.model.TextMessagesModel;
 import ch.templer.model.VideoModel;
@@ -58,13 +60,17 @@ public class FragmentTransactionProcessingService {
             args.putInt(VideoFragment.audioID, R.raw.adelle_hello);
             videoFragment.setArguments(args);
             transaction.replace(R.id.fragment_container, videoFragment);
-        } else if (message instanceof MultipleChoiceModel) {
-            log.d("MultipleChoiceModel found. start MultipleChoiceFragment", Logger.LOGGER_DEPTH.LOGGER_METHOD);
-            MultipleChoiceFragment multipleChoiceFragment = MultipleChoiceFragment.newInstance((MultipleChoiceModel) message);
-            transaction.replace(R.id.fragment_container, multipleChoiceFragment);
+        } else if (message instanceof QuizModel) {
+            log.d("QuizModel found. start QuizFragment", Logger.LOGGER_DEPTH.LOGGER_METHOD);
+            QuizFragment quizFragment = QuizFragment.newInstance((QuizModel) message);
+            transaction.replace(R.id.fragment_container, quizFragment);
         }else if(message instanceof MapLocationModel){
             log.d("MapLocationModel found. start MapFragment", Logger.LOGGER_DEPTH.LOGGER_METHOD);
             MapFragment mapFragment = MapFragment.newInstance((MapLocationModel) message);
+            transaction.replace(R.id.fragment_container, mapFragment);
+        }else if(message instanceof SelfieModel){
+            log.d("SelfieModel found. start SelfieFragment", Logger.LOGGER_DEPTH.LOGGER_METHOD);
+            SelfieFragment mapFragment = SelfieFragment.newInstance((SelfieModel) message);
             transaction.replace(R.id.fragment_container, mapFragment);
         }
         fragmentCounter++;
