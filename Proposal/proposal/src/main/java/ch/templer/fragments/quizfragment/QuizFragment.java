@@ -172,14 +172,6 @@ public class QuizFragment extends AbstractFragment {
         return (view);
     }
 
-    public static void sendViewToBack(final View child) {
-        final ViewGroup parent = (ViewGroup) child.getParent();
-        if (null != parent) {
-            parent.removeView(child);
-            parent.addView(child, 0);
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

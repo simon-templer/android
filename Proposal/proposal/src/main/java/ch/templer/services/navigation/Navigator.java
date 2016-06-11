@@ -21,7 +21,7 @@ import org.apache.http.util.EntityUtils;
 import java.util.ArrayList;
 
 public class Navigator {
-    @SuppressWarnings("unused")
+    private final static String DEFAULT_LANGUAGE = "en";
     private Context context;
     private LatLng startPosition, endPosition;
     private String mode;
@@ -37,11 +37,17 @@ public class Navigator {
     private String avoid;
     private ArrayList<Polyline> lines = new ArrayList<Polyline>();
     private NavigationDescriptionListener navigationDescriptionListener;
+    private String language;
 
     public Navigator(GoogleMap map, LatLng startLocation, LatLng endLocation) {
+        this(map, startLocation, endLocation, DEFAULT_LANGUAGE);
+    }
+
+    public Navigator(GoogleMap map, LatLng startLocation, LatLng endLocation, String language) {
         this.startPosition = startLocation;
         this.endPosition = endLocation;
         this.map = map;
+        this.language = language;
     }
 
     public interface OnPathSetListener {
@@ -180,10 +186,11 @@ public class Navigator {
             String url = "http://maps.googleapis.com/maps/api/directions/json?"
                     + "origin=" + startPosition.latitude + "," + startPosition.longitude
                     + "&destination=" + endPosition.latitude + "," + endPosition.longitude
-                    + "&sensor=false&units=metric&mode=" + mode + "&alternatives=" + String.valueOf(alternatives);
+                    + "&sensor=false&units=metric&mode=" + mode + "&alternatives=" + String.valueOf(alternatives)
+                    + "&language=" + language;
 
             if (avoid != null) {
-                url += url + "&avoid=" + avoid;
+                url += "&avoid=" + avoid;
             }
 
             try {

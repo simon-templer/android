@@ -71,6 +71,7 @@ public class FABToolbarLayout extends RelativeLayout {
     private boolean isFab = true;
     private boolean isToolbar = false;
     private boolean isInit = true;
+    private boolean isShown = false;
 
     private boolean fabDrawableAnimationEnabled = true;
 
@@ -344,6 +345,7 @@ public class FABToolbarLayout extends RelativeLayout {
         });
 
         animatorSet.start();
+        isShown = true;
     }
 
     public void hide() {
@@ -447,6 +449,12 @@ public class FABToolbarLayout extends RelativeLayout {
         });
 
         animatorSet.start();
+        isShown = false;
+    }
+
+    @Override
+    public boolean isShown() {
+        return isShown;
     }
 
     public boolean isFab() {

@@ -99,8 +99,11 @@ public class TestData {
 
         MapLocationModel mapLocationModel = new MapLocationModel();
 
-        mapLocationModel.setLatitude(48.660463);
-        mapLocationModel.setLongitude(8.943870);
+        mapLocationModel.setLatitude(46.521930);
+        mapLocationModel.setLongitude(30.614898);
+
+//        mapLocationModel.setLatitude(48.660463);
+//        mapLocationModel.setLongitude(8.943870);
 
 //        mapLocationModel.setLatitude(48.834002);
 //        mapLocationModel.setLongitude(9.151623);

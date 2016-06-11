@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +39,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Locale;
+
 import ch.templer.activities.R;
 import ch.templer.animation.FabTransformAnimation;
 import ch.templer.animation.FloatingActionButtonTransitionAnimation;
@@ -45,7 +50,9 @@ import ch.templer.controls.listener.AnimationFinishedListener;
 import ch.templer.controls.reveallayout.RevealLayout;
 import ch.templer.fragments.service.FragmentTransactionProcessingService;
 import ch.templer.model.MapLocationModel;
+import ch.templer.services.multimedia.SoundService;
 import ch.templer.services.navigation.AvoidMode;
+import ch.templer.services.navigation.Directions;
 import ch.templer.services.navigation.NavigationMode;
 import ch.templer.services.navigation.Navigator;
 
@@ -60,6 +67,13 @@ import ch.templer.services.navigation.Navigator;
 public class MapFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
     private static final String MAP_FRAGMENT_MODEL_ID = "MAP_FRAGMENT_MODEL_ID";
+    private static final String CURRENT_NAVIGATIONMODE = "CURRENT_NAVIGATIONMODE";
+    private static final String CURRENT_LATITUDE = "CURRENT_LATITUDE";
+    private static final String CURRENT_LONGITUTE = "CURRENT_LONGITUTE";
+    private static final String IS_FABTOOLBARLAYOUT_SHOWN = "IS_FABTOOLBARLAYOUT_SHOWN";
+
+
+
 
     Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
@@ -75,6 +89,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     private FABToolbarLayout fabToolbarLayout;
     private LinearLayout linearLayout;
     private CoordinatorLayout coordinatorLayout;
+    private ImageView refresh;
+    private ImageView car;
+    private ImageView train;
+    private ImageView walk;
 
     private NavigationMode prevMode;
     private Navigator navigator;
@@ -84,6 +102,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     private Snackbar mySnackbar;
     private MapLocationModel mapLocationModel;
     private Location destinationLocation = new Location("destination");
+    private boolean isFabToolbarLayoutShown = false;
+
+    // Vibrate pattern
+    int dot = 300;      // Length of a Morse Code "dot" in milliseconds
+    int short_gap = 200;    // Length of Gap Between dots/dashes
+    long[] pattern = {
+            0,  // Start immediately
+            dot, short_gap, dot, short_gap, dot};
+
     public MapFragment() {
 
     }
@@ -114,6 +141,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        //restore state
+        if (savedInstanceState != null) {
+            prevMode = (NavigationMode) savedInstanceState.getSerializable(CURRENT_NAVIGATIONMODE);
+            currentLatitude = savedInstanceState.getDouble(CURRENT_LATITUDE);
+            currentLongitude = savedInstanceState.getDouble(CURRENT_LONGITUTE);
+            isFabToolbarLayoutShown = savedInstanceState.getBoolean(IS_FABTOOLBARLAYOUT_SHOWN);
+        }
+
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
         mRevealView.setBackgroundColor(mapLocationModel.getNextFragmentBackroundColor());
@@ -127,22 +163,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
             }
         });
 
-        fabtoolbar_fab.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                transformFab();
-            }
-        },5000);
-
-        ImageView refresh = (ImageView) view.findViewById(R.id.refresh);
-        ImageView car = (ImageView) view.findViewById(R.id.car);
-        ImageView train = (ImageView) view.findViewById(R.id.train);
-        ImageView walk = (ImageView) view.findViewById(R.id.walk);
+        refresh = (ImageView) view.findViewById(R.id.refresh);
+        car = (ImageView) view.findViewById(R.id.car);
+        train = (ImageView) view.findViewById(R.id.train);
+        walk = (ImageView) view.findViewById(R.id.walk);
 
         refresh.setOnClickListener(this);
         car.setOnClickListener(this);
         train.setOnClickListener(this);
         walk.setOnClickListener(this);
+        lockNavigationModeButtons();
 
         coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.CoordinatorLayout);
 
@@ -160,7 +190,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     private FloatingActionButton fabtoolbar_fab;
 
     protected void transformFab() {
+        SoundService.playSound(this.getContext(),R.raw.navigation_success);
         fabToolbarLayout.hide();
+        Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(pattern,-1);
         showSnackbar("Location Reached", Snackbar.LENGTH_INDEFINITE);
         fabToolbarLayout.postDelayed(new Runnable() {
             @Override
@@ -172,7 +205,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
                     @Override
                     public void onAnimationFinished() {
                         FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
-                        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(fabtoolbar_fab, mRevealView, mRevealLayout,mySnackbar, transaction);
+                        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(fabtoolbar_fab, mRevealView, mRevealLayout, mySnackbar, transaction);
                         fabtoolbar_fab.setOnClickListener(floatingActionButtonAnimationOnClickListener);
                     }
                 });
@@ -185,7 +218,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
 //        if (mySnackbar != null){
 //            mySnackbar.dismiss();
 //        }
-        mySnackbar = Snackbar.make(coordinatorLayout, message, length);
+        Spanned formatedMessage = Html.fromHtml(message);
+        mySnackbar = Snackbar.make(coordinatorLayout, formatedMessage, length);
         View snackbarView = mySnackbar.getView();
         TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setMaxLines(4);
@@ -240,6 +274,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude())));
         mMap.animateCamera(CameraUpdateFactory.zoomIn());
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+
+        // as soon as map is ready navigation requests are allowed
+        unlockNavigationModeButtons();
+
+        //Initialize Navigator
+        setUpNavigator();
+        //restore potential navigation state after rotation
+        if (prevMode != null){
+            navigator.setMode(prevMode,AvoidMode.TOLLS);
+            navigator.findDirections(false);
+        }
+        //restore FabToolbarLayout if allready shown
+//        if (isFabToolbarLayoutShown){
+//            fabToolbarLayout.show();
+//        }
     }
 
     synchronized void buildGoogleApiClient() {
@@ -248,14 +297,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
-
     }
 
     @Override
-    public void onClick(View view) {
-        setUpNavigator(view);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(CURRENT_NAVIGATIONMODE, prevMode);
+        outState.putDouble(CURRENT_LATITUDE, currentLatitude);
+        outState.putDouble(CURRENT_LONGITUTE, currentLongitude);
+        outState.putBoolean(IS_FABTOOLBARLAYOUT_SHOWN, fabToolbarLayout.isShown());
+    }
 
+
+    @Override
+    public void onClick(View view) {
+        view.startAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.image_click));
+        //avvoid multiple immediate clicks
+        lockNavigationModeButtons();
+        setUpNavigator();
         switch (view.getId()) {
             case R.id.walk:
                 navigator.setMode(NavigationMode.WALKING, AvoidMode.TOLLS);
@@ -263,28 +322,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
                 break;
             case R.id.train:
                 navigator.setMode(NavigationMode.TRANSIT, AvoidMode.TOLLS);
-                prevMode=NavigationMode.TRANSIT;
+                prevMode = NavigationMode.TRANSIT;
                 break;
             case R.id.car:
                 navigator.setMode(NavigationMode.DRIVING, AvoidMode.TOLLS);
-                prevMode=NavigationMode.DRIVING;
+                prevMode = NavigationMode.DRIVING;
                 break;
             case R.id.refresh:
-                if (prevMode == null){
+                if (prevMode == null) {
                     return;
                 }
                 navigator.setMode(prevMode, AvoidMode.TOLLS);
                 break;
         }
         navigator.findDirections(false);
+
+        fabToolbarLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                unlockNavigationModeButtons();
+            }
+        },2000);
     }
 
-    private void setUpNavigator(View view) {
-        view.startAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.image_click));
+    private void lockNavigationModeButtons() {
+        refresh.setClickable(false);
+        car.setClickable(false);
+        train.setClickable(false);
+        walk.setClickable(false);
+    }
+
+    private void unlockNavigationModeButtons() {
+        refresh.setClickable(true);
+        car.setClickable(true);
+        train.setClickable(true);
+        walk.setClickable(true);
+    }
+
+    private void setUpNavigator() {
         LatLng startPosition = new LatLng(currentLatitude, currentLongitude);
         LatLng destinationCoordinates = new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude());
-        if (navigator == null){
-            navigator = new Navigator(mMap,startPosition,destinationCoordinates);
+        if (navigator == null) {
+            navigator = new Navigator(mMap, startPosition, destinationCoordinates, Locale.getDefault().getLanguage());
             navigator.setNavigationDescriptionListener(new Navigator.NavigationDescriptionListener() {
                 @Override
                 public void onNavigationDescription(String descitpion) {
@@ -293,7 +372,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
                     fabToolbarLayout.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (mySnackbar != null){
+                            if (mySnackbar != null) {
                                 mySnackbar.dismiss();
                             }
                             fabToolbarLayout.postDelayed(new Runnable() {
@@ -307,7 +386,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
                     }, 500);
                 }
             });
-        }else{
+        } else {
             navigator.clear();
             navigator.setStartPosition(startPosition);
         }
@@ -344,8 +423,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     public void onLocationChanged(Location location) {
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
-        if (location.distanceTo(destinationLocation)<= mapLocationModel.getRadius() && !isLocationReached){
-            isLocationReached=true;
+        if (location.distanceTo(destinationLocation) <= mapLocationModel.getRadius() && !isLocationReached) {
+            isLocationReached = true;
             finishNavigation();
         }
     }
