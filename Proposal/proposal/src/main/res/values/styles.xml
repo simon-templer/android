@@ -29,6 +29,12 @@
         <item name="android:background">@color/black_overlay</item>
     </style>
 
+    <style name="SpotsDialogDefault" parent="android:Theme.DeviceDefault.Light.Dialog">
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="DialogTitleText">Loading…</item>
+        <item name="DialogSpotCount">5</item>
+    </style>
+
     <declare-styleable name="FABToolbarLayout">
         <attr name="showDuration" format="integer"/>
         <attr name="hideDuration" format="integer"/>
@@ -42,5 +48,26 @@
         <attr name="fabToolbarId" format="reference"/>
         <attr name="fabDrawableAnimationEnabled" format="boolean"/>
     </declare-styleable>
+
+    <style name="alert_dialog_color_theme_turquise" parent="android:Theme.DeviceDefault.Dialog">
+        <item name="android:windowBackground">@color/PALETTE_TURQOUISE_MAIN_COLOR</item>
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="DialogSpotColor">@color/PALETTE_TURQOUISE_MAIN_TEXT_COLOR</item>
+        <item name="DialogSpotCount">8</item>
+    </style>
+
+    <style name="alert_dialog_color_theme_lightgreen" parent="android:Theme.DeviceDefault.Dialog">
+        <item name="android:windowBackground">@color/PALETTE_LIGHTGREEN_MAIN_COLOR</item>
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="DialogSpotColor">@color/PALETTE_LIGHTGREEN_MAIN_TEXT_COLOR</item>
+        <item name="DialogSpotCount">8</item>
+    </style>
+
+    <style name="alert_dialog_color_theme_deeppurple" parent="android:Theme.DeviceDefault.Dialog">
+        <item name="android:windowBackground">@color/PALETTE_DEEPPURPLE_MAIN_COLOR</item>
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="DialogSpotColor">@color/PALETTE_DEEPPURPLE_MAIN_TEXT_COLOR</item>
+        <item name="DialogSpotCount">8</item>
+    </style>
 
 </resources>

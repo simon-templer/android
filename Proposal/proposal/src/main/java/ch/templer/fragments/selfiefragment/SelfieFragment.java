@@ -1,4 +1,4 @@
-package ch.templer.fragments;
+package ch.templer.fragments.selfiefragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -77,7 +77,7 @@ public class SelfieFragment extends Fragment {
         mRevealView = view.findViewById(R.id.reveal_view);
         mRevealView.setBackgroundColor(selfieModel.getNextFragmentBackroundColor());
 
-        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
 
         FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton, mRevealView, mRevealLayout, transaction);
         floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);

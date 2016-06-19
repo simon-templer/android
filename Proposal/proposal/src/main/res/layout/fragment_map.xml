@@ -38,6 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|bottom"
+                android:scaleType="fitXY"
                 layout_behavior="ch.templer.controls.viewbehaviour.FloatingActionButtonBehavior"
                 app:fabSize="normal"
                 app:borderWidth="0dp"

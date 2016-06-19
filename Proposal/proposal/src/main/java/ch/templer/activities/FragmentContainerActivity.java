@@ -29,7 +29,7 @@ public class FragmentContainerActivity extends FragmentActivity implements IFrag
         Button nextFragmentButton = (Button) findViewById(R.id.next_fragment_button);
         nextFragmentButton.setOnClickListener(this);
 
-        FragmentTransactionProcessingService.prepareNextFragmentTransaction(getSupportFragmentManager().beginTransaction()).commit();
+        FragmentTransactionProcessingService.prepareNextFragmentTransaction(getSupportFragmentManager().beginTransaction(),this).commit();
     }
 
     @Override
@@ -56,6 +56,6 @@ public class FragmentContainerActivity extends FragmentActivity implements IFrag
     @Override
     public void onClick(View v) {
 
-        FragmentTransactionProcessingService.prepareNextFragmentTransaction(getSupportFragmentManager().beginTransaction()).commit();
+        FragmentTransactionProcessingService.prepareNextFragmentTransaction(getSupportFragmentManager().beginTransaction(),this).commit();
     }
 }

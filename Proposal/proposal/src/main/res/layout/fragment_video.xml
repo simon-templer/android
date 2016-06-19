@@ -1,13 +1,42 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="ch.templer.fragments.VideoFragment">
+    android:id="@+id/video_fragment_frame_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <!-- Video player -->
+    <FrameLayout
+        android:id="@+id/frameLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dip">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        <VideoView
+            android:id="@+id/myVideo"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"></VideoView>
+
+        <FrameLayout
+            android:id="@+id/placeholder"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></FrameLayout>
+    </FrameLayout>
+
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/video_fragment_overlay"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#96000000">
+
+
+        <ImageButton
+            android:id="@+id/video_fragment_overlay_button"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_play_arrow_40dp" />
+    </FrameLayout>
 
 </FrameLayout>

@@ -11,5 +11,32 @@
     <color name="green_dark">#277d8c</color>
     <color name="bright_green">#277d8c</color>
     <color name="button_green">#277d8c</color>
+    <color name="error_red">#BF1E4B</color>
+
+    <color name="spots_dialog_color">#FFFFFF</color>
+
+    <color name="PALETTE_TURQOUISE_FRAGMENT_BACKGROUND_COLOR">#FFFFFF</color>
+    <color name="PALETTE_TURQOUISE_THIRDARY_COLOR">#23277D8C</color>
+    <color name="PALETTE_TURQOUISE_THIRDARY_TEXT_COLOR">#518A94</color>
+    <color name="PALETTE_TURQOUISE_MAIN_COLOR">#277D8C</color>
+    <color name="PALETTE_TURQOUISE_MAIN_TEXT_COLOR">#FFFFFF</color>
+    <color name="PALETTE_TURQOUISE_SECONDARY_COLOR">#005D6F</color>
+    <color name="PALETTE_TURQOUISE_SECONDARY_TEXT_COLOR">#FFFFFF</color>
+
+    <color name="PALETTE_LIGHTGREEN_FRAGMENT_BACKGROUND_COLOR">#FFFFFF</color>
+    <color name="PALETTE_LIGHTGREEN_THIRDARY_COLOR">#2333691E</color>
+    <color name="PALETTE_LIGHTGREEN_THIRDARY_TEXT_COLOR">#7CB342</color>
+    <color name="PALETTE_LIGHTGREEN_MAIN_COLOR">#689F38</color>
+    <color name="PALETTE_LIGHTGREEN_MAIN_TEXT_COLOR">#FFFFFF</color>
+    <color name="PALETTE_LIGHTGREEN_SECONDARY_COLOR">#558B2F</color>
+    <color name="PALETTE_LIGHTGREEN_SECONDARY_TEXT_COLOR">#FFFFFF</color>
+
+    <color name="PALETTE_DEEPPURPLE_FRAGMENT_BACKGROUND_COLOR">#EDE7F6</color>
+    <color name="PALETTE_DEEPPURPLE_THIRDARY_COLOR">#723E57C2</color>
+    <color name="PALETTE_DEEPPURPLE_THIRDARY_TEXT_COLOR">#D1C4E9</color>
+    <color name="PALETTE_DEEPPURPLE_MAIN_COLOR">#4527A0</color>
+    <color name="PALETTE_DEEPPURPLE_MAIN_TEXT_COLOR">#FFFFFF</color>
+    <color name="PALETTE_DEEPPURPLE_SECONDARY_COLOR">#5E35B1</color>
+    <color name="PALETTE_DEEPPURPLE_SECONDARY_TEXT_COLOR">#FFFFFF</color>
 
 </resources>

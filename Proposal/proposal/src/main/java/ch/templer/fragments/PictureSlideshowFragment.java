@@ -86,7 +86,7 @@ public class PictureSlideshowFragment extends AbstractFragment {
         frameLayout = (FrameLayout) view.findViewById(R.id.PictureFragment_FrameLayout);
         frameLayout.setBackgroundColor(pictureSlideshowModel.getBackgroundColor());
 
-        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
 
         FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton, mRevealView, mRevealLayout, transaction);
         floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);

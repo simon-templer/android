@@ -126,7 +126,7 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
             @Override
             public boolean onMenuItemSelected(MenuItem menuItem) {
                 if ( menuItem.getItemId() == R.id.action_next){
-                    FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+                    FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
                     FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(nextFragmentFab, mRevealView, mRevealLayout, transaction);
                     floatingActionButtonAnimationOnClickListener.runAnimation();
                 }else if (menuItem.getItemId() == R.id.action_refresh){

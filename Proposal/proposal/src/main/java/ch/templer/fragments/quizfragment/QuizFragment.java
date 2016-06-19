@@ -100,10 +100,10 @@ public class QuizFragment extends AbstractFragment {
         buttonContainer = (LinearLayout) view.findViewById(R.id.ButtonContainer);
 
         RelativeLayout topBar = (RelativeLayout) view.findViewById(R.id.topBar);
-        topBar.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getToolBarBackgroundColor());
+        topBar.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getSecondaryColor());
 
         correctAnswers = (TextView) view.findViewById(R.id.correct_answers_text_view);
-        correctAnswers.setTextColor(quizModel.getFragmentColors().getColorTheme().getButtonTextColor());
+        correctAnswers.setTextColor(quizModel.getFragmentColors().getColorTheme().getMainTextColor());
         floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
@@ -124,7 +124,7 @@ public class QuizFragment extends AbstractFragment {
             freezeButtons();
         }
 
-        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
+        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
 
         FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton, mRevealView, mRevealLayout, transaction);
         floatingActionButtonAnimationOnClickListener.setAnimationStartListener(new AnimationStartListener() {
@@ -141,7 +141,7 @@ public class QuizFragment extends AbstractFragment {
         textSwitcher = (TextSwitcher) view.findViewById(R.id.multiple_choice_fragment_question_text_switcher);
         textSwitcher.setInAnimation(this.getContext(), R.anim.slide_in_left);
         textSwitcher.setOutAnimation(this.getContext(), R.anim.slide_out_right);
-        textSwitcher.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getTextViewBackgroundColor());
+        textSwitcher.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getThirdaryColor());
         textSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
 
             public View makeView() {
@@ -151,8 +151,8 @@ public class QuizFragment extends AbstractFragment {
                 textView.setLayoutParams(layoutParams);
                 textView.setTypeface(null, Typeface.BOLD);
                 textView.setTextSize(18);
-                textView.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getTextViewBackgroundColor());
-                textView.setTextColor(quizModel.getFragmentColors().getColorTheme().getTextViewTextColor());
+                textView.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getThirdaryColor());
+                textView.setTextColor(quizModel.getFragmentColors().getColorTheme().getThirdaryTextColor());
                 return textView;
             }
         });
@@ -167,7 +167,7 @@ public class QuizFragment extends AbstractFragment {
         updateTopBar();
 
         coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.CoordinatorLayout);
-        coordinatorLayout.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getViewBackgroundColor());
+        coordinatorLayout.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getFragmentBackgroundColor());
 
         return (view);
     }
@@ -183,7 +183,7 @@ public class QuizFragment extends AbstractFragment {
     private void showSnackbar(String message, int lenght) {
         Snackbar mySnackbar = Snackbar.make(coordinatorLayout, message, lenght);
         View snackbarView = mySnackbar.getView();
-        snackbarView.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getToolBarBackgroundColor());
+        snackbarView.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getSecondaryColor());
         TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setMaxLines(4);
         mySnackbar.show();
@@ -193,8 +193,8 @@ public class QuizFragment extends AbstractFragment {
     private void setupButtons(QuestionAndAnswers questionAndAnswers) {
         for (int i = 0; i < questionAndAnswers.getAnswers().size(); i++) {
             AnswerButton answerButton = answerButtons.get(i);
-            answerButton.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getButtonBackgroundColor());
-            answerButton.setTextColor(quizModel.getFragmentColors().getColorTheme().getButtonTextColor());
+            answerButton.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getMainColor());
+            answerButton.setTextColor(quizModel.getFragmentColors().getColorTheme().getMainTextColor());
             answerButton.setText(questionAndAnswers.getAnswers().get(i).getAnswer());
             answerButton.setIsCorrectAnswer(questionAndAnswers.getAnswers().get(i).isCorrectAnswer());
             answerButton.setOnClickListener(quizClickListener);
@@ -265,7 +265,7 @@ public class QuizFragment extends AbstractFragment {
                 AnswerButton answerButton = answerButtons.get(i);
                 answerButton.setText(questionAndAnswers.getAnswers().get(i).getAnswer());
                 answerButton.setIsCorrectAnswer(questionAndAnswers.getAnswers().get(i).isCorrectAnswer());
-                answerButton.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getButtonBackgroundColor());
+                answerButton.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getMainColor());
                 answerButton.setOnClickListener(quizClickListener);
                 SoundService.playSound(this.getContext(), R.raw.swoosh);
 

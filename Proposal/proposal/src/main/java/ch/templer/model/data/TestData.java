@@ -1,19 +1,17 @@
 package ch.templer.model.data;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.templer.activities.R;
 import ch.templer.model.AbstractMessageModel;
-import ch.templer.model.Answer;
 import ch.templer.model.ColorTheme;
 import ch.templer.model.FragmentColors;
 import ch.templer.model.MapLocationModel;
-import ch.templer.model.QuizModel;
-import ch.templer.model.PictureSlideshowModel;
-import ch.templer.model.QuestionAndAnswers;
 import ch.templer.model.SelfieModel;
-import ch.templer.model.TextMessagesModel;
+import ch.templer.model.VideoFragmentModel;
 import ch.templer.utils.Colors;
 
 /**
@@ -23,20 +21,26 @@ public class TestData {
     private List<AbstractMessageModel> messages;
 
     private static TestData instance = null;
+    private Context context;
 
-    public static TestData getInstance() {
-        if(instance == null) {
-            instance = new TestData();
+    public static TestData getInstance(Context context) {
+        if (instance == null) {
+            instance = new TestData(context);
         }
         return instance;
     }
 
-    protected TestData() {
+    protected TestData(Context context) {
         messages = new ArrayList<AbstractMessageModel>();
+        this.context = context;
         generateTestData();
     }
 
     private void generateTestData() {
+
+        FragmentColors fragmentColors = new FragmentColors();
+        fragmentColors.setColorTheme(ColorTheme.constructColorTheme(ColorTheme.ColorThemeType.DEEPPURPLE, context));
+        fragmentColors.setNextFragmentBackroundColor(Colors.Amber);
 
 //        QuizModel quizModel = new QuizModel();
 //        List<QuestionAndAnswers> qAndAs =  new ArrayList<>();
@@ -53,17 +57,14 @@ public class TestData {
 //            questionAndAnswers.setWrongMessage("That is incorrect");
 //            qAndAs.add(questionAndAnswers);
 //        }
-//        FragmentColors fragmentColors = new FragmentColors();
-//        fragmentColors.setNextFragmentBackroundColor(Colors.White);
-//        fragmentColors.setColorTheme(ColorTheme.constructColorTheme(ColorTheme.ColorThemeType.TURQOUISE));
-//        fragmentColors.setNextFragmentBackroundColor(Colors.Amber);
+//
 //        quizModel.setFragmentColors(fragmentColors);
 //        quizModel.setBackgroundColor(Colors.White);
 //        quizModel.setQAndA(qAndAs);
 //        quizModel.setFabAppearAnimationTime(1000);
 //        quizModel.setTitle("Quiz 1 - Easy");
 //        this.messages.add(quizModel);
-
+//
 //        TextMessagesModel textMessagesModel = new TextMessagesModel();
 //        ArrayList<String> texts = new ArrayList<String>();
 //        texts.add("Hallo Mein Schatz");
@@ -94,13 +95,14 @@ public class TestData {
 //        SelfieModel selfieModel = new SelfieModel();
 //        selfieModel.setBackgroundColor(Colors.ImageSliderBackground);
 //        selfieModel.setNextFragmentBackroundColor(Colors.White);
+//        selfieModel.setFragmentColors(fragmentColors);
 //        selfieModel.setDescription("Test Description to take a selfie!!!");
 //        this.messages.add(selfieModel);
-
-        MapLocationModel mapLocationModel = new MapLocationModel();
-
-        mapLocationModel.setLatitude(46.521930);
-        mapLocationModel.setLongitude(30.614898);
+//
+//        MapLocationModel mapLocationModel = new MapLocationModel();
+//
+//        mapLocationModel.setLatitude(46.521930);
+//        mapLocationModel.setLongitude(30.614898);
 
 //        mapLocationModel.setLatitude(48.660463);
 //        mapLocationModel.setLongitude(8.943870);
@@ -113,11 +115,18 @@ public class TestData {
 
 //        mapLocationModel.setLatitude(46.979631);
 //        mapLocationModel.setLongitude(7.456857);
-        mapLocationModel.setRadius(3);
-        mapLocationModel.setBackgroundColor(Colors.White);
-        mapLocationModel.setNextFragmentBackroundColor(Colors.White);
-        this.messages.add(mapLocationModel);
+//        mapLocationModel.setRadius(3);
+//        mapLocationModel.setBackgroundColor(Colors.White);
+//        mapLocationModel.setNextFragmentBackroundColor(Colors.White);
+//        mapLocationModel.setFragmentColors(fragmentColors);
+//        this.messages.add(mapLocationModel);
 
+        VideoFragmentModel videoFragmentModel = new VideoFragmentModel();
+        videoFragmentModel.setBackgroundColor(Colors.ImageSliderBackground);
+        videoFragmentModel.setNextFragmentBackroundColor(Colors.White);
+        videoFragmentModel.setFragmentColors(fragmentColors);
+        videoFragmentModel.setVideoResourceID(R.raw.video1);
+        this.messages.add(videoFragmentModel);
     }
 
     public List<AbstractMessageModel> getMessages() {

@@ -3,7 +3,6 @@
     <string name="action_fragments">Fragments</string>
     <string name="action_maps">Maps Activity</string>
 
-
     <string name="title_activity_fullscreen_main">FullscreenMain</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -14,4 +13,12 @@
     <string name="hint">Hint</string>
     <string name="title_activity_map_location">MapLocationActivity</string>
     <string name="title_activity_test">test</string>
+
+
+    <string name="map_fragment_connection_error_message">Unable to reach navigation service. Is a internet connection present and Location Service enabled?</string>
+    <string name="map_fragment_location_reached_message">Location Reached</string>
+    <string name="map_fragment_destination_title">Destination</string>
+    <string name="map_fragment_gps_unavailable_error_message">Please activate your location service to use the full functionality of this application.</string>
+
+    <string name="alert_dialog_title">Please Wait</string>
 </resources>

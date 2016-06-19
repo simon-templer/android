@@ -1,13 +1,19 @@
 package ch.templer.fragments.mapfragment;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -16,20 +22,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,71 +42,67 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import ch.templer.activities.R;
 import ch.templer.animation.FabTransformAnimation;
 import ch.templer.animation.FloatingActionButtonTransitionAnimation;
 import ch.templer.animation.ViewAppearAnimation;
+import ch.templer.controls.alertdialog.SpotsDialog;
 import ch.templer.controls.fab.fabtoolbarlayout.FABToolbarLayout;
 import ch.templer.controls.listener.AnimationFinishedListener;
 import ch.templer.controls.reveallayout.RevealLayout;
 import ch.templer.fragments.service.FragmentTransactionProcessingService;
+import ch.templer.fragments.service.SnackbarService;
 import ch.templer.model.MapLocationModel;
 import ch.templer.services.multimedia.SoundService;
-import ch.templer.services.navigation.AvoidMode;
-import ch.templer.services.navigation.Directions;
-import ch.templer.services.navigation.NavigationMode;
 import ch.templer.services.navigation.Navigator;
+import ch.templer.services.navigation2.AbstractRouting;
+import ch.templer.services.navigation2.Route;
+import ch.templer.services.navigation2.RouteException;
+import ch.templer.services.navigation2.Routing;
+import ch.templer.services.navigation2.RoutingListener;
+import ch.templer.utils.logging.Logger;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MapFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class MapFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+        GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, RoutingListener {
+    //Staticidentifier
     private static final String MAP_FRAGMENT_MODEL_ID = "MAP_FRAGMENT_MODEL_ID";
     private static final String CURRENT_NAVIGATIONMODE = "CURRENT_NAVIGATIONMODE";
     private static final String CURRENT_LATITUDE = "CURRENT_LATITUDE";
     private static final String CURRENT_LONGITUTE = "CURRENT_LONGITUTE";
     private static final String IS_FABTOOLBARLAYOUT_SHOWN = "IS_FABTOOLBARLAYOUT_SHOWN";
 
-
-
-
-    Location mLastLocation;
-    private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
-    double currentLatitude, currentLongitude;
-
-    private GoogleMap mMap;
-
-    private Marker destinationMarker;
-
+    //UI member variables
     private View mRevealView;
     private RevealLayout mRevealLayout;
     private FABToolbarLayout fabToolbarLayout;
-    private LinearLayout linearLayout;
     private CoordinatorLayout coordinatorLayout;
     private ImageView refresh;
     private ImageView car;
     private ImageView train;
     private ImageView walk;
+    private Marker destinationMarker;
+    private FloatingActionButton fabtoolbar_fab;
+    private AlertDialog progressDialog;
 
-    private NavigationMode prevMode;
+    //Location member variables
+    Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    double currentLatitude, currentLongitude;
+    private GoogleMap mMap;
+    private List<Polyline> polylines = new ArrayList<>();
+
+    //Navigation member Variables
+    private AbstractRouting.TravelMode prevMode;
     private Navigator navigator;
-    private String currentSnackbarDescription;
-
-    private OnFragmentInteractionListener mListener;
-    private Snackbar mySnackbar;
-    private MapLocationModel mapLocationModel;
-    private Location destinationLocation = new Location("destination");
-    private boolean isFabToolbarLayoutShown = false;
+    private Location destinationLocation;
 
     // Vibrate pattern
     int dot = 300;      // Length of a Morse Code "dot" in milliseconds
@@ -110,6 +110,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     long[] pattern = {
             0,  // Start immediately
             dot, short_gap, dot, short_gap, dot};
+
+    //misc
+    private String currentSnackbarDescription;
+    private MapLocationModel mapLocationModel;
+    private boolean isFabToolbarLayoutShown = false;
+    private boolean isLocationReached = false;
+    private int polylineColor = Color.rgb(66, 133, 244);
+    private Handler mHandler = new Handler();
+    public OnFragmentInteractionListener mListener;
+    private static Logger log = Logger.getLogger();
 
     public MapFragment() {
 
@@ -129,12 +139,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         if (getArguments() != null) {
             mapLocationModel = (MapLocationModel) getArguments().getSerializable(MAP_FRAGMENT_MODEL_ID);
         }
-
+        destinationLocation = new Location(getString(R.string.map_fragment_destination_title));
         destinationLocation.setLatitude(mapLocationModel.getLatitude());
         destinationLocation.setLongitude(mapLocationModel.getLongitude());
 
         buildGoogleApiClient();
+    }
 
+    synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this.getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     @Override
@@ -144,18 +161,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
 
         //restore state
         if (savedInstanceState != null) {
-            prevMode = (NavigationMode) savedInstanceState.getSerializable(CURRENT_NAVIGATIONMODE);
+            prevMode = (AbstractRouting.TravelMode) savedInstanceState.getSerializable(CURRENT_NAVIGATIONMODE);
             currentLatitude = savedInstanceState.getDouble(CURRENT_LATITUDE);
             currentLongitude = savedInstanceState.getDouble(CURRENT_LONGITUTE);
             isFabToolbarLayoutShown = savedInstanceState.getBoolean(IS_FABTOOLBARLAYOUT_SHOWN);
         }
 
+        //setup UI
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
         mRevealView.setBackgroundColor(mapLocationModel.getNextFragmentBackroundColor());
 
         fabToolbarLayout = (FABToolbarLayout) view.findViewById(R.id.fabtoolbar);
         fabtoolbar_fab = (FloatingActionButton) view.findViewById(R.id.fabtoolbar_fab);
+        fabtoolbar_fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_navigation_white_40dp, null));
+        fabtoolbar_fab.setBackgroundTintList(ColorStateList.valueOf(mapLocationModel.getFragmentColors().getColorTheme().getMainColor()));
         fabtoolbar_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -176,127 +196,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
 
         coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.CoordinatorLayout);
 
+        //get Google Map API v2 MapFragment
         FragmentManager fragmentManager = getChildFragmentManager();
+        SupportMapFragment supportMapFragment = (SupportMapFragment) fragmentManager.findFragmentById(R.id.map);
+        supportMapFragment.getMapAsync(this);
 
-        SupportMapFragment test = (SupportMapFragment) fragmentManager.findFragmentById(R.id.map);
+        //check if GPS is available/active
+        checkPSEnabled();
 
-        test.getMapAsync(this);
-
-        linearLayout = (LinearLayout) view.findViewById(R.id.fabtoolbar_toolbar);
+        fabToolbarLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finishNavigation();
+            }
+        },5000);
 
         return view;
     }
 
-    private FloatingActionButton fabtoolbar_fab;
-
-    protected void transformFab() {
-        SoundService.playSound(this.getContext(),R.raw.navigation_success);
-        fabToolbarLayout.hide();
-        Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(pattern,-1);
-        showSnackbar("Location Reached", Snackbar.LENGTH_INDEFINITE);
-        fabToolbarLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ColorStateList colorStateList = ColorStateList.valueOf(getResources().getColor(R.color.bright_green));
-                Drawable drawable = getResources().getDrawable(R.drawable.ic_arrow_forward_24dp, null);
-                FabTransformAnimation fabTransformAnimation = new FabTransformAnimation(fabtoolbar_fab, colorStateList, drawable);
-                fabTransformAnimation.setAnimationFinishedListener(new AnimationFinishedListener() {
-                    @Override
-                    public void onAnimationFinished() {
-                        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction());
-                        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(fabtoolbar_fab, mRevealView, mRevealLayout, mySnackbar, transaction);
-                        fabtoolbar_fab.setOnClickListener(floatingActionButtonAnimationOnClickListener);
-                    }
-                });
-                fabTransformAnimation.runAnimation();
-            }
-        }, 500);
-    }
-
-    private void showSnackbar(String message, int length) {
-//        if (mySnackbar != null){
-//            mySnackbar.dismiss();
-//        }
-        Spanned formatedMessage = Html.fromHtml(message);
-        mySnackbar = Snackbar.make(coordinatorLayout, formatedMessage, length);
-        View snackbarView = mySnackbar.getView();
-        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setMaxLines(4);
-        mySnackbar.setAction("Dismiss", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mySnackbar.dismiss();
-            }
-        });
-        mySnackbar.show();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    private void checkPSEnabled() {
+        LocationManager lm = (LocationManager) this.getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) && !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            SnackbarService.showSnackbar(this.getContext(), coordinatorLayout,mapLocationModel.getFragmentColors().getColorTheme().getMainColor(), getString(R.string.map_fragment_gps_unavailable_error_message), Snackbar.LENGTH_INDEFINITE, true);
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                fabToolbarLayout.hide();
-            }
-        });
-        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-        }
-        MarkerOptions destinationMarkerOptions = new MarkerOptions();
-        destinationMarkerOptions.title("Destination");
-        destinationMarkerOptions.snippet("Marker Xo Xo");
-        destinationMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        LatLng destinationCoordinates = new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude());
-        destinationMarkerOptions.position(destinationCoordinates);
-        destinationMarker = mMap.addMarker(destinationMarkerOptions);
-
-        ViewAppearAnimation.runAnimation(this.getView(), 1000);
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude())));
-        mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
-        // as soon as map is ready navigation requests are allowed
-        unlockNavigationModeButtons();
-
-        //Initialize Navigator
-        setUpNavigator();
-        //restore potential navigation state after rotation
-        if (prevMode != null){
-            navigator.setMode(prevMode,AvoidMode.TOLLS);
-            navigator.findDirections(false);
-        }
-        //restore FabToolbarLayout if allready shown
-//        if (isFabToolbarLayoutShown){
-//            fabToolbarLayout.show();
-//        }
-    }
-
-    synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this.getContext())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
     }
 
     @Override
@@ -308,41 +230,151 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         outState.putBoolean(IS_FABTOOLBARLAYOUT_SHOWN, fabToolbarLayout.isShown());
     }
 
-
     @Override
     public void onClick(View view) {
         view.startAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.image_click));
         //avvoid multiple immediate clicks
         lockNavigationModeButtons();
-        setUpNavigator();
+        //setUpNavigator();
         switch (view.getId()) {
             case R.id.walk:
-                navigator.setMode(NavigationMode.WALKING, AvoidMode.TOLLS);
-                prevMode = NavigationMode.WALKING;
+                prevMode = AbstractRouting.TravelMode.WALKING;
                 break;
             case R.id.train:
-                navigator.setMode(NavigationMode.TRANSIT, AvoidMode.TOLLS);
-                prevMode = NavigationMode.TRANSIT;
+                prevMode = AbstractRouting.TravelMode.TRANSIT;
                 break;
             case R.id.car:
-                navigator.setMode(NavigationMode.DRIVING, AvoidMode.TOLLS);
-                prevMode = NavigationMode.DRIVING;
+                prevMode = AbstractRouting.TravelMode.DRIVING;
                 break;
             case R.id.refresh:
                 if (prevMode == null) {
+                    unlockNavigationModeButtons();
                     return;
                 }
-                navigator.setMode(prevMode, AvoidMode.TOLLS);
                 break;
         }
-        navigator.findDirections(false);
+        startNavigation();
 
+        //delay unlocking the Navigation Buttons. This avoid to many requests.
         fabToolbarLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
                 unlockNavigationModeButtons();
             }
-        },2000);
+        }, 2000);
+    }
+
+    //Callback when GoogleMap is ready for use. The Fragment is only usable after this method call
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        // hide toolbar when map is clicked
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                fabToolbarLayout.hide();
+            }
+        });
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
+        //requestin location service
+        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        }
+
+        //setting up destination marker with complete address information
+        MarkerOptions destinationMarkerOptions = new MarkerOptions();
+        destinationMarkerOptions.title(getString(R.string.map_fragment_destination_title));
+        destinationMarkerOptions.snippet(mapLocationModel.getLatitude() + "/" + mapLocationModel.getLongitude());
+        destinationMarkerOptions.snippet(getCompleteAddressString(mapLocationModel.getLatitude(), mapLocationModel.getLongitude()));
+        destinationMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        LatLng destinationCoordinates = new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude());
+        destinationMarkerOptions.position(destinationCoordinates);
+        destinationMarker = mMap.addMarker(destinationMarkerOptions);
+        destinationMarker.showInfoWindow();
+
+        // Fragment might be reconstructed after a onDestroy(). In these situations we navigate to the previous know location
+        if (prevMode != null) {
+            startNavigation();
+        } else {
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude())));
+            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+        }
+
+        // as soon as map is ready navigation requests are allowed
+        unlockNavigationModeButtons();
+
+        //restore FabToolbarLayout if allready shown
+//        if (isFabToolbarLayoutShown){
+//            fabToolbarLayout.show();
+//        }
+
+        // complete view appear animation
+        ViewAppearAnimation.runAnimation(this.getView(), 1000);
+    }
+
+    private void startNavigation() {
+        this.getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+        showProgressDialog();
+
+        this.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+        LatLng startPosition = new LatLng(currentLatitude, currentLongitude);
+        LatLng destinationCoordinates = new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude());
+        Routing routing = new Routing.Builder()
+                .travelMode(prevMode)
+                .withListener(this)
+                .alternativeRoutes(false)
+                .waypoints(startPosition, destinationCoordinates)
+                .language(Locale.getDefault().getLanguage())
+                .build();
+        routing.execute();
+    }
+
+    // returns the complete address based on specified location coordinates
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+        String strAdd = "";
+        Geocoder geocoder = new Geocoder(this.getContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append(", ");
+                }
+                strAdd = strReturnedAddress.toString();
+                log.w("My Current loction address:" + strReturnedAddress.toString(), Logger.LOGGER_DEPTH.LOGGER_METHOD);
+            } else {
+                strAdd = LATITUDE + ", " + LONGITUDE;
+                log.w("My Current loction address: No Address returned. Specified Location coordinates returned.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            strAdd = LATITUDE + ", " + LONGITUDE;
+            log.w("My Current loction address: Canont get Address.  Specified Location coordinates returned.");
+        }
+        return strAdd;
+    }
+
+
+    // The immersive fullscreen mode of Android does not work correctly with a Dialog because the window focus changes
+    // and forces a appearance of the soft buttons. To avoid this you have to set the new dialog as non focusable
+    private void showProgressDialog() {
+        int styleID = getResources().getIdentifier(mapLocationModel.getFragmentColors().getColorTheme().getAlerDialogStyle(), "style", getContext().getPackageName());
+        progressDialog = new SpotsDialog(this.getContext(), getString(R.string.alert_dialog_title), styleID);
+        //Set the dialog to not focusable (makes navigation ignore us adding the window)
+        progressDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        progressDialog.show();
+        //Set the dialog to immersive
+        progressDialog.getWindow().getDecorView().setSystemUiVisibility(this.getActivity().getWindow().getDecorView().getSystemUiVisibility());
+
+        //Clear the not focusable flag from the window
+        this.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
     private void lockNavigationModeButtons() {
@@ -359,39 +391,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         walk.setClickable(true);
     }
 
-    private void setUpNavigator() {
-        LatLng startPosition = new LatLng(currentLatitude, currentLongitude);
-        LatLng destinationCoordinates = new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude());
-        if (navigator == null) {
-            navigator = new Navigator(mMap, startPosition, destinationCoordinates, Locale.getDefault().getLanguage());
-            navigator.setNavigationDescriptionListener(new Navigator.NavigationDescriptionListener() {
-                @Override
-                public void onNavigationDescription(String descitpion) {
-                    currentSnackbarDescription = descitpion;
-
-                    fabToolbarLayout.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mySnackbar != null) {
-                                mySnackbar.dismiss();
-                            }
-                            fabToolbarLayout.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    showSnackbar(currentSnackbarDescription, Snackbar.LENGTH_INDEFINITE);
-                                }
-                            }, 500);
-
-                        }
-                    }, 500);
-                }
-            });
-        } else {
-            navigator.clear();
-            navigator.setStartPosition(startPosition);
-        }
-    }
-
     @Override
     public void onConnected(Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -401,8 +400,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(1000); // Update location every second
 
+        //set this class as LocationListener
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
+        //retrieve last location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -417,12 +418,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
 
     }
 
-    boolean isLocationReached = false;
-
     @Override
     public void onLocationChanged(Location location) {
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
+        // check if location is within the destination radius
         if (location.distanceTo(destinationLocation) <= mapLocationModel.getRadius() && !isLocationReached) {
             isLocationReached = true;
             finishNavigation();
@@ -430,7 +430,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     }
 
     private void finishNavigation() {
-        transformFab();
+        transformFabToContinueButton();
+    }
+
+    protected void transformFabToContinueButton() {
+        //hide toolbar
+        fabToolbarLayout.hide();
+        //user feedback
+        SoundService.playSound(this.getContext(), R.raw.navigation_success);
+        Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(pattern, -1);
+        SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, mapLocationModel.getFragmentColors().getColorTheme().getSecondaryColor(), getString(R.string.map_fragment_location_reached_message), Snackbar.LENGTH_INDEFINITE, false);
+
+        //transform animation. Animation is delayed, because of the user feedback above takes some time (Especially the toolbar hide animation)
+        fabToolbarLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ColorStateList colorStateList = ColorStateList.valueOf(getResources().getColor(R.color.bright_green));
+                Drawable drawable = getResources().getDrawable(R.drawable.ic_arrow_forward_24dp, null);
+                FabTransformAnimation fabTransformAnimation = new FabTransformAnimation(fabtoolbar_fab, colorStateList, drawable);
+                fabTransformAnimation.setAnimationFinishedListener(new AnimationFinishedListener() {
+                    @Override
+                    public void onAnimationFinished() {
+                        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
+                        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(fabtoolbar_fab, mRevealView, mRevealLayout, SnackbarService.getSnackbar(), transaction);
+                        fabtoolbar_fab.setOnClickListener(floatingActionButtonAnimationOnClickListener);
+                    }
+                });
+                fabTransformAnimation.runAnimation();
+            }
+        }, 500);
     }
 
     @Override
@@ -448,6 +477,112 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     public void onDestroy() {
         super.onDestroy();
         mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onRoutingFailure(RouteException e) {
+        progressDialog.dismiss();
+        SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, mapLocationModel.getFragmentColors().getColorTheme().getSecondaryColor(), getString(R.string.map_fragment_connection_error_message), Snackbar.LENGTH_INDEFINITE, true);
+    }
+
+    @Override
+    public void onRoutingStart() {
+        // not unessessary
+    }
+
+    @Override
+    public void onRoutingSuccess(List<Route> route, int shortestRouteIndex) {
+        LatLng startPosition = new LatLng(currentLatitude, currentLongitude);
+        LatLng destinationCoordinates = new LatLng(mapLocationModel.getLatitude(), mapLocationModel.getLongitude());
+
+        //get routing instruction
+        currentSnackbarDescription = route.get(0).getSegments().get(0).getInstruction();
+
+        // Is necessary to make a smooth animation between two Snackbar apperances.
+        // The first postDelayed gives enough time for the snackbar to vanish, before the next one is shown
+        fabToolbarLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SnackbarService.dismiss();
+                fabToolbarLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        SnackbarService.showSnackbar(getContext(), coordinatorLayout, mapLocationModel.getFragmentColors().getColorTheme().getSecondaryColor(), currentSnackbarDescription, Snackbar.LENGTH_INDEFINITE, false);
+                    }
+                }, 500);
+
+            }
+        }, 500);
+
+        CameraUpdate center = CameraUpdateFactory.newLatLng(startPosition);
+        mMap.moveCamera(center);
+
+        //remove previous Polylines
+        if (polylines.size() > 0) {
+            for (Polyline poly : polylines) {
+                poly.remove();
+            }
+        }
+
+        polylines = new ArrayList<>();
+
+        // add Polylines asynchronously
+        mHandler.post(new ApplyDirectionResultAsyn(route));
+
+        // End marker
+        MarkerOptions options = new MarkerOptions();
+        options = new MarkerOptions();
+        options.position(destinationCoordinates);
+        options.title(getString(R.string.map_fragment_destination_title));
+        options.snippet(route.get(0).getEndAddressText());
+        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        mMap.addMarker(options);
+
+        progressDialog.dismiss();
+        destinationMarker.remove();
+    }
+
+    // This Runnable draws all Polylines for a specific rout on the GoogleMap
+    class ApplyDirectionResultAsyn implements Runnable {
+        private List<Route> route;
+
+        public ApplyDirectionResultAsyn(List<Route> route) {
+            this.route = route;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < route.size(); i++) {
+                PolylineOptions polyOptions = new PolylineOptions();
+                polyOptions.color(polylineColor);
+                polyOptions.width(10 + i * 3);
+                polyOptions.addAll(route.get(i).getPoints());
+                Polyline polyline = mMap.addPolyline(polyOptions);
+                polylines.add(polyline);
+            }
+        }
+    }
+
+    @Override
+    public void onRoutingCancelled() {
+        // is not allowed user interaction (no UI element)
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     public interface OnFragmentInteractionListener {
