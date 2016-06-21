@@ -7,8 +7,7 @@
         android:id="@+id/frameLayout1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="center"
-        android:layout_marginTop="50dip">
+        android:layout_gravity="center">
 
         <VideoView
             android:id="@+id/myVideo"
@@ -18,8 +17,9 @@
 
         <FrameLayout
             android:id="@+id/placeholder"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"></FrameLayout>
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"></FrameLayout>
     </FrameLayout>
 
 
@@ -38,5 +38,28 @@
             android:background="@android:color/transparent"
             android:src="@drawable/ic_play_arrow_40dp" />
     </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingButton"
+        layout_behavior="com.support.android.designlibdemo.ScrollAwareFABBehavior"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_arrow_forward_24dp" />
+
+    <ch.templer.controls.reveallayout.RevealLayout
+        android:id="@+id/reveal_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
+        <View
+            android:id="@+id/reveal_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
+
+    </ch.templer.controls.reveallayout.RevealLayout>
 
 </FrameLayout>

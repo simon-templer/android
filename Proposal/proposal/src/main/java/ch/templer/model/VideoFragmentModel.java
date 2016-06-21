@@ -6,6 +6,7 @@ package ch.templer.model;
 public class VideoFragmentModel extends AbstractMessageModel {
 
     private int videoResourceID;
+    private int fabAppearAnimationTime;
 
     public int getVideoResourceID() {
         return videoResourceID;
@@ -13,5 +14,13 @@ public class VideoFragmentModel extends AbstractMessageModel {
 
     public void setVideoResourceID(int videoResourceID) {
         this.videoResourceID = videoResourceID;
+    }
+
+    public void setFabAppearAnimationTime(int fabAppearAnimationTime) {
+        this.fabAppearAnimationTime = fabAppearAnimationTime;
+    }
+
+    public int getFabAppearAnimationTime() {
+        return fabAppearAnimationTime;
     }
 }

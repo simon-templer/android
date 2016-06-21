@@ -124,6 +124,7 @@ public class TestData {
         VideoFragmentModel videoFragmentModel = new VideoFragmentModel();
         videoFragmentModel.setBackgroundColor(Colors.ImageSliderBackground);
         videoFragmentModel.setNextFragmentBackroundColor(Colors.White);
+        videoFragmentModel.setFabAppearAnimationTime(1000);
         videoFragmentModel.setFragmentColors(fragmentColors);
         videoFragmentModel.setVideoResourceID(R.raw.video1);
         this.messages.add(videoFragmentModel);
