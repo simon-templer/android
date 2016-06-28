@@ -1,9 +1,9 @@
-package ch.templer.activities;
+package ch.templer.fragments;
 
-import ch.templer.fragments.FinishedFragment;
-import ch.templer.fragments.PictureSlideshowFragment;
+import ch.templer.fragments.finishfragment.FinishedFragment;
+import ch.templer.fragments.pictureslideshowfragment.PictureSlideshowFragment;
 import ch.templer.fragments.selfiefragment.SelfieFragment;
-import ch.templer.fragments.TextMessagesFragment;
+import ch.templer.fragments.textmessagesfragment.TextMessagesFragment;
 import ch.templer.fragments.videofragment.VideoFragment;
 import ch.templer.fragments.mapfragment.MapFragment;
 import ch.templer.fragments.quizfragment.QuizFragment;

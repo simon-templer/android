@@ -1,14 +1,11 @@
-package ch.templer.fragments;
+package ch.templer.fragments.textmessagesfragment;
 
 import android.content.Context;
-import android.content.DialogInterface;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -17,23 +14,24 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import ch.templer.activities.R;
+import ch.templer.activities.settingsactivity.SettingsActivity;
 import ch.templer.animation.ColorTransitionAnimation;
-import ch.templer.animation.FloatingActionButtonTransitionAnimation;
 import ch.templer.animation.TextFadeInOutAnimation;
 import ch.templer.animation.ViewAppearAnimation;
 import ch.templer.controls.listener.AnimationFinishedListener;
 import ch.templer.controls.reveallayout.RevealLayout;
-import ch.templer.fragments.service.FragmentTransactionProcessingService;
+import ch.templer.fragments.AbstractFragment;
 import ch.templer.model.TextMessagesModel;
+import ch.templer.services.SettingsService;
 import ch.templer.services.multimedia.SoundService;
-import io.github.yavski.fabspeeddial.FabSpeedDial;
-import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
 
 public class TextMessagesFragment extends AbstractFragment implements AnimationFinishedListener {
     private static final String TEXT_MESSAGES_MODEL_ID = "textMessageID";
     private static final String TEXT_MESSAGE_POSITION_ID = "TEXT_MESSAGE_POSITION_ID";
     private static final String COLOR_TRANSITION_POSITION_ID = "COLOR_TRANSITION_POSITION_ID";
+    private static final String SONG_POSITION_ID = "SONG_POSITION_ID";
+    private static final String TEXT_ANIMATION_FINISHED = "TEXT_ANIMATION_FINISHED";
 
     private FrameLayout frameLayout;
     private TextView content;
@@ -42,12 +40,11 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
 
     private TextMessagesModel textMessagesModel;
 
-    private FabSpeedDial nextFragmentFab;
-    //private FloatingActionButton restartTextAnimationFab;
+    private FloatingActionButton nextFragmentFab;
+    private FloatingActionButton restartTextAnimationFab;
     private View mRevealView;
     private RevealLayout mRevealLayout;
-
-    private boolean textAnimationFinished=false;
+    private boolean textAnimationFinished = false;
 
     protected static final class MyNonConfig {
         // fill with public variables keeping references and other state info, set to null
@@ -82,28 +79,47 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(TEXT_MESSAGE_POSITION_ID, textFadeInOutAnimation.getFadeCount());
+        if (!textAnimationFinished) {
+            outState.putInt(TEXT_MESSAGE_POSITION_ID, textFadeInOutAnimation.getFadeCount());
+        }
         outState.putInt(COLOR_TRANSITION_POSITION_ID, colorTransitionAnimation.getCurrentPosition());
-        outState.putInt("songPosition", SoundService.getSongPosition());
+        outState.putInt(SONG_POSITION_ID, SoundService.getSongPosition());
+        outState.putBoolean(TEXT_ANIMATION_FINISHED, textAnimationFinished);
         SoundService.stop();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_text_messages, container, false);
 
-        nextFragmentFab = (FabSpeedDial) view.findViewById(R.id.fab_speed_dial);
-        nextFragmentFab.setVisibility(View.INVISIBLE);
-//        restartTextAnimationFab = (FloatingActionButton) view.findViewById(R.id.restartTextAnimationFab);
-//        restartTextAnimationFab.setVisibility(View.INVISIBLE);
-//        restartTextAnimationFab.setOnClickListener(this);
+        nextFragmentFab = (FloatingActionButton) view.findViewById(R.id.nextFragmentFab);
+        restartTextAnimationFab = (FloatingActionButton) view.findViewById(R.id.restartTextAnimationFab);
+        restartTextAnimationFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                restartTextAnimationFab.setClickable(false);
+                textFadeInOutAnimation.stop();
+                textFadeInOutAnimation = new TextFadeInOutAnimation(textMessagesModel.getMessages(), content, textMessagesModel.getTextViewShowTime(), textMessagesModel.getTextAnimationDuration(), 0);
+                textFadeInOutAnimation.runAnimation();
+                textAnimationFinished = false;
+
+                restartTextAnimationFab.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        restartTextAnimationFab.setClickable(true);
+                    }
+                }, textMessagesModel.getTextViewShowTime());
+            }
+        });
+
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
-        mRevealView.setBackgroundColor(textMessagesModel.getNextFragmentBackroundColor());
+        mRevealView.setBackgroundColor(textMessagesModel.getFragmentColors().getNextFragmentBackroundColor());
 
         frameLayout = (FrameLayout) view.findViewById(R.id.TextMessageFragment_FrameLayout);
-        frameLayout.setBackgroundColor(textMessagesModel.getBackgroundColor());
+        frameLayout.setBackgroundColor(textMessagesModel.getFragmentColors().getFragmentBackgroundColor());
         content = (TextView) view.findViewById(R.id.text_messages_fragment_content_textview);
 
         int currentTextMessagesPosition = 0;
@@ -111,32 +127,23 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
         int songPosition = 0;
         if (savedInstanceState != null) {
             currentTextMessagesPosition = savedInstanceState.getInt(TEXT_MESSAGE_POSITION_ID);
-            songPosition = savedInstanceState.getInt("songPosition");
+            songPosition = savedInstanceState.getInt(SONG_POSITION_ID);
             currentColorTransitionPosition = savedInstanceState.getInt(COLOR_TRANSITION_POSITION_ID);
+            textAnimationFinished = savedInstanceState.getBoolean(TEXT_ANIMATION_FINISHED);
         }
-        if (!textAnimationFinished){
+        if (!textAnimationFinished) {
             textFadeInOutAnimation = new TextFadeInOutAnimation(textMessagesModel.getMessages(), content, textMessagesModel.getTextViewShowTime(), textMessagesModel.getTextAnimationDuration(), currentTextMessagesPosition);
             textFadeInOutAnimation.setAnimationFinishedListener(this);
         }
 
-        colorTransitionAnimation = new ColorTransitionAnimation(frameLayout, textMessagesModel.getBackgroundAnimationColors(), textMessagesModel.getBackgroundColorTransitionTime(), currentColorTransitionPosition);
+        if (fragmentFinished || SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false)) {
+            fragmentFinished(nextFragmentFab, mRevealView, mRevealLayout);
+        } else {
+            restartTextAnimationFab.setVisibility(View.INVISIBLE);
+            nextFragmentFab.setVisibility(View.INVISIBLE);
+        }
 
-
-        nextFragmentFab.setMenuListener(new SimpleMenuListenerAdapter() {
-            @Override
-            public boolean onMenuItemSelected(MenuItem menuItem) {
-                if ( menuItem.getItemId() == R.id.action_next){
-                    FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
-                    FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(nextFragmentFab, mRevealView, mRevealLayout, transaction);
-                    floatingActionButtonAnimationOnClickListener.runAnimation();
-                }else if (menuItem.getItemId() == R.id.action_refresh){
-                    textFadeInOutAnimation = new TextFadeInOutAnimation(textMessagesModel.getMessages(), content, textMessagesModel.getTextViewShowTime(), textMessagesModel.getTextAnimationDuration(), 0);
-                    textFadeInOutAnimation.runAnimation();
-                }
-                return false;
-            }
-
-        });
+        colorTransitionAnimation = new ColorTransitionAnimation(getContext(), frameLayout, textMessagesModel.getBackgroundAnimationColors(), textMessagesModel.getBackgrountColorTransitionTime(), currentColorTransitionPosition);
         if (!SoundService.isPlaying()) {
             SoundService.playSound(this.getContext(), textMessagesModel.getBackgroundMusicID(), songPosition);
         }
@@ -183,13 +190,17 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
+                        if (!textAnimationFinished) {
+                            textFadeInOutAnimation.runAnimation();
+                        }
                         colorTransitionAnimation.runAnimation();
-                        textFadeInOutAnimation.runAnimation();
                     }
                 });
             } else {
+                if (!textAnimationFinished) {
+                    textFadeInOutAnimation.runAnimation();
+                }
                 colorTransitionAnimation.runAnimation();
-                textFadeInOutAnimation.runAnimation();
             }
         }
         return anim;
@@ -215,8 +226,9 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
     @Override
     public void onAnimationFinished() {
         ViewAppearAnimation.runAnimation(nextFragmentFab, textMessagesModel.getTextAnimationDuration());
-        //ViewAppearAnimation.runAnimation(restartTextAnimationFab, textMessagesModel.getTextAnimationDuration());
+        ViewAppearAnimation.runAnimation(restartTextAnimationFab, textMessagesModel.getTextAnimationDuration());
         textAnimationFinished = true;
+        fragmentFinished(nextFragmentFab, mRevealView, mRevealLayout);
     }
 
     public interface OnFragmentInteractionListener {

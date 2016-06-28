@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,18 +22,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.templer.activities.R;
+import ch.templer.activities.settingsactivity.SettingsActivity;
 import ch.templer.animation.BlinkAnimation;
 import ch.templer.animation.FlipAnimation;
-import ch.templer.animation.FloatingActionButtonTransitionAnimation;
 import ch.templer.animation.ViewAppearAnimation;
 import ch.templer.controls.answerbutton.AnswerButton;
 import ch.templer.controls.listener.AnimationFinishedListener;
-import ch.templer.controls.listener.AnimationStartListener;
 import ch.templer.controls.reveallayout.RevealLayout;
 import ch.templer.fragments.AbstractFragment;
-import ch.templer.fragments.service.FragmentTransactionProcessingService;
-import ch.templer.model.QuizModel;
+import ch.templer.fragments.service.SnackbarService;
+import ch.templer.model.ColorTheme;
 import ch.templer.model.QuestionAndAnswers;
+import ch.templer.model.QuizModel;
+import ch.templer.services.SettingsService;
 import ch.templer.services.multimedia.SoundService;
 import ch.templer.utils.Colors;
 
@@ -63,6 +63,7 @@ public class QuizFragment extends AbstractFragment {
     private boolean answerPressed = false;
 
     private QuizAnswerClickListener quizClickListener = new QuizAnswerClickListener();
+    private ColorTheme colorTheme;
 
     public QuizFragment() {
         // Required empty public constructor
@@ -100,10 +101,10 @@ public class QuizFragment extends AbstractFragment {
         buttonContainer = (LinearLayout) view.findViewById(R.id.ButtonContainer);
 
         RelativeLayout topBar = (RelativeLayout) view.findViewById(R.id.topBar);
-        topBar.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getSecondaryColor());
+        topBar.setBackgroundColor(colorTheme.getSecondaryColor());
 
         correctAnswers = (TextView) view.findViewById(R.id.correct_answers_text_view);
-        correctAnswers.setTextColor(quizModel.getFragmentColors().getColorTheme().getMainTextColor());
+        correctAnswers.setTextColor(colorTheme.getMainTextColor());
         floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
@@ -119,29 +120,19 @@ public class QuizFragment extends AbstractFragment {
         answerButtons.add(answerButtonFour);
         setupButtons(questionAndAnswers);
 
-        //necessary for last question iteration
-        if (questionCounter > questionAndAnswers.getAnswers().size()){
+        if (fragmentFinished || SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false)) {
+            floatingActionButton.setVisibility(View.VISIBLE);
+            fragmentFinished(floatingActionButton, mRevealView, mRevealLayout);
+            //necessary for last question iteration
             freezeButtons();
+        } else {
+            floatingActionButton.setVisibility(View.INVISIBLE);
         }
-
-        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
-
-        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton, mRevealView, mRevealLayout, transaction);
-        floatingActionButtonAnimationOnClickListener.setAnimationStartListener(new AnimationStartListener() {
-            @Override
-            public void onAnimationStarted() {
-
-                //ViewVanishAnimation.runAnimation(floatingActionButton, 1000);
-             //  floatingActionButton.setVisibility(View.GONE);
-            }
-        });
-        floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);
-        floatingActionButton.setVisibility(View.INVISIBLE);
 
         textSwitcher = (TextSwitcher) view.findViewById(R.id.multiple_choice_fragment_question_text_switcher);
         textSwitcher.setInAnimation(this.getContext(), R.anim.slide_in_left);
         textSwitcher.setOutAnimation(this.getContext(), R.anim.slide_out_right);
-        textSwitcher.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getThirdaryColor());
+        textSwitcher.setBackgroundColor(colorTheme.getThirdaryColor());
         textSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
 
             public View makeView() {
@@ -151,8 +142,8 @@ public class QuizFragment extends AbstractFragment {
                 textView.setLayoutParams(layoutParams);
                 textView.setTypeface(null, Typeface.BOLD);
                 textView.setTextSize(18);
-                textView.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getThirdaryColor());
-                textView.setTextColor(quizModel.getFragmentColors().getColorTheme().getThirdaryTextColor());
+                textView.setBackgroundColor(colorTheme.getThirdaryColor());
+                textView.setTextColor(colorTheme.getThirdaryTextColor());
                 return textView;
             }
         });
@@ -167,7 +158,7 @@ public class QuizFragment extends AbstractFragment {
         updateTopBar();
 
         coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.CoordinatorLayout);
-        coordinatorLayout.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getFragmentBackgroundColor());
+        coordinatorLayout.setBackgroundColor(colorTheme.getFragmentBackgroundColor());
 
         return (view);
     }
@@ -177,26 +168,17 @@ public class QuizFragment extends AbstractFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             quizModel = (QuizModel) getArguments().getSerializable(MULTIPLE_CHOICE_FRAGMENT_MODEL_ID);
+            colorTheme = ColorTheme.constructColorTheme(quizModel.getFragmentColors().getColorThemeType(), this.getContext());
         }
     }
-
-    private void showSnackbar(String message, int lenght) {
-        Snackbar mySnackbar = Snackbar.make(coordinatorLayout, message, lenght);
-        View snackbarView = mySnackbar.getView();
-        snackbarView.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getSecondaryColor());
-        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setMaxLines(4);
-        mySnackbar.show();
-    }
-
 
     private void setupButtons(QuestionAndAnswers questionAndAnswers) {
         for (int i = 0; i < questionAndAnswers.getAnswers().size(); i++) {
             AnswerButton answerButton = answerButtons.get(i);
-            answerButton.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getMainColor());
-            answerButton.setTextColor(quizModel.getFragmentColors().getColorTheme().getMainTextColor());
+            answerButton.setBackgroundColor(colorTheme.getMainColor());
+            answerButton.setTextColor(colorTheme.getMainTextColor());
             answerButton.setText(questionAndAnswers.getAnswers().get(i).getAnswer());
-            answerButton.setIsCorrectAnswer(questionAndAnswers.getAnswers().get(i).isCorrectAnswer());
+            answerButton.setIsCorrectAnswer(questionAndAnswers.getAnswers().get(i).getCorrectAnswer());
             answerButton.setOnClickListener(quizClickListener);
         }
     }
@@ -232,7 +214,7 @@ public class QuizFragment extends AbstractFragment {
         super.onSaveInstanceState(outState);
         outState.putInt(QUIZ_POSITION_ID, questionCounter);
         outState.putInt(QUIZ_CORRECT_ANSWER_COUNTER_ID, correctAnswersCounter);
-        outState.putBoolean(ANSWER_PRESSED_ID,answerPressed);
+        outState.putBoolean(ANSWER_PRESSED_ID, answerPressed);
     }
 
     @Override
@@ -250,7 +232,7 @@ public class QuizFragment extends AbstractFragment {
         QuestionAndAnswers questionAndAnswers = null;
         if (questionCounter - 1 < quizModel.getQAndAs().size()) {
             questionAndAnswers = quizModel.getQAndAs().get(questionCounter - 1);
-        }else {
+        } else {
             questionAndAnswers = quizModel.getQAndAs().get(quizModel.getQAndAs().size() - 1);
         }
         return questionAndAnswers;
@@ -264,8 +246,8 @@ public class QuizFragment extends AbstractFragment {
             for (int i = 0; i < answerButtons.size(); i++) {
                 AnswerButton answerButton = answerButtons.get(i);
                 answerButton.setText(questionAndAnswers.getAnswers().get(i).getAnswer());
-                answerButton.setIsCorrectAnswer(questionAndAnswers.getAnswers().get(i).isCorrectAnswer());
-                answerButton.setBackgroundColor(quizModel.getFragmentColors().getColorTheme().getMainColor());
+                answerButton.setIsCorrectAnswer(questionAndAnswers.getAnswers().get(i).getCorrectAnswer());
+                answerButton.setBackgroundColor(colorTheme.getMainColor());
                 answerButton.setOnClickListener(quizClickListener);
                 SoundService.playSound(this.getContext(), R.raw.swoosh);
 
@@ -282,14 +264,19 @@ public class QuizFragment extends AbstractFragment {
 
         } else {
             textSwitcher.setClickable(false);
-            ViewAppearAnimation.runAnimation(floatingActionButton, quizModel.getFabAppearAnimationTime());
+            prepareNextFragmentButton();
         }
 
     }
 
+    private void prepareNextFragmentButton() {
+        fragmentFinished(floatingActionButton, mRevealView, mRevealLayout);
+        ViewAppearAnimation.runAnimation(floatingActionButton, quizModel.getFabAppearAnimationTime());
+    }
+
     private void processCorrectAnswer(AnswerButton answerButton) {
         correctAnswersCounter++;
-        showSnackbar(getCurrentQuestion().getCorrectMessage(), Snackbar.LENGTH_LONG);
+        SnackbarService.showSnackbar(coordinatorLayout, getCurrentQuestion().getCorrectMessage(), colorTheme.getSecondaryColor(), Snackbar.LENGTH_LONG);
         SoundService.playSound(this.getContext(), R.raw.correct);
         updateTopBar();
         answerButton.setBackgroundColor(Colors.Green);
@@ -325,7 +312,7 @@ public class QuizFragment extends AbstractFragment {
         answerButton.setBackgroundColor(Colors.Red);
 
         AnswerButton correctAnswerButton = getCorrectAnswerButton();
-        showSnackbar(getCurrentQuestion().getWrongMessage(), Snackbar.LENGTH_LONG);
+        SnackbarService.showSnackbar(coordinatorLayout, getCurrentQuestion().getWrongMessage(), colorTheme.getSecondaryColor(), Snackbar.LENGTH_LONG);
 
         correctAnswerButton.postDelayed(new Runnable() {
             @Override

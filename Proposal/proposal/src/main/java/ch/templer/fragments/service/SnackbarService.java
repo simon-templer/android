@@ -23,21 +23,21 @@ public class SnackbarService {
         showSnackbar(constetx, coordinatorLayout, color, message, length, false);
     }
 
-    public static void showSnackbar(Context constetx, CoordinatorLayout coordinatorLayout,  int color, String message, int length, boolean asAllert) {
+    public static void showSnackbar(Context context, CoordinatorLayout coordinatorLayout, int color, String message, int length, boolean asAllert) {
         Spanned formatedMessage = Html.fromHtml(message);
         snackbar = Snackbar.make(coordinatorLayout, formatedMessage, length);
         View snackbarView = snackbar.getView();
         TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setMaxLines(5);
-        if (asAllert){
-            snackbarView.setBackgroundColor(ContextCompat.getColor(constetx, R.color.error_red));
+        if (asAllert) {
+            snackbarView.setBackgroundColor(ContextCompat.getColor(context, R.color.error_red));
             snackbar.setActionTextColor(Color.WHITE);
-        }else {
+        } else {
             snackbarView.setBackgroundColor(color);
             snackbar.setActionTextColor(Color.WHITE);
         }
 
-        snackbar.setAction("Dismiss", new View.OnClickListener() {
+        snackbar.setAction(context.getString(R.string.snackbar_dismiss_button), new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 snackbar.dismiss();
@@ -46,11 +46,21 @@ public class SnackbarService {
         snackbar.show();
     }
 
-    public static void dismiss(){
-        if (snackbar != null){
+    public static void dismiss() {
+        if (snackbar != null) {
             snackbar.dismiss();
         }
     }
+
+    public static void showSnackbar(CoordinatorLayout coordinatorLayout, String message,int color, int lenght) {
+        snackbar = Snackbar.make(coordinatorLayout, message, lenght);
+        View snackbarView = snackbar.getView();
+        snackbarView.setBackgroundColor(color);
+        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setMaxLines(4);
+        snackbar.show();
+    }
+
 
     public static Snackbar getSnackbar() {
         return snackbar;

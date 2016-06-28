@@ -17,7 +17,7 @@ public class PhotoViewPagerAdapter extends PagerAdapter {
         return imageIds.length;
     }
 
-    public PhotoViewPagerAdapter(int[] imageIds){
+    public PhotoViewPagerAdapter(int[] imageIds) {
         this.imageIds = imageIds;
     }
 

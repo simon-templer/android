@@ -6,7 +6,6 @@
 
     <color name="black_overlay">#66000000</color>
 
-    <!-- Green -->
     <color name="green_temp">#277d8c</color>
     <color name="green_dark">#277d8c</color>
     <color name="bright_green">#277d8c</color>
@@ -38,5 +37,36 @@
     <color name="PALETTE_DEEPPURPLE_MAIN_TEXT_COLOR">#FFFFFF</color>
     <color name="PALETTE_DEEPPURPLE_SECONDARY_COLOR">#5E35B1</color>
     <color name="PALETTE_DEEPPURPLE_SECONDARY_TEXT_COLOR">#FFFFFF</color>
+
+    <color name="TRANSITION_COLOR_GREEN">#FF60A917</color>
+    <color name="TRANSITION_COLOR_LIME">#FFA4C400</color>
+    <color name="TRANSITION_COLOR_EMERALD">#FF008A00</color>
+    <color name="TRANSITION_COLOR_TEAL">#FF00ABA9</color>
+    <color name="TRANSITION_COLOR_CYAN">#FF1BA1E2</color>
+    <color name="TRANSITION_COLOR_COBALT">#FF0050EF</color>
+    <color name="TRANSITION_COLOR_INDIGO">#FF6A00FF</color>
+    <color name="TRANSITION_COLOR_VIOLET">#FFAA00FF</color>
+    <color name="TRANSITION_COLOR_PINK">#FFF472D0</color>
+    <color name="TRANSITION_COLOR_MAGENTA">#FFD80073</color>
+    <color name="TRANSITION_COLOR_CRIMSON">#A20025</color>
+    <color name="TRANSITION_COLOR_RED">#FFE51400</color>
+    <color name="TRANSITION_COLOR_ORANGE">#FFFA6800</color>
+    <color name="TRANSITION_COLOR_AMBER">#F0A30A</color>
+    <color name="TRANSITION_COLOR_YELLOW">#FFE3C800</color>
+    <color name="TRANSITION_COLOR_BROWN">#FF825A2C</color>
+    <color name="TRANSITION_COLOR_OLIVE">#FF6D8764</color>
+    <color name="TRANSITION_COLOR_STEEL">#FF647687</color>
+    <color name="TRANSITION_COLOR_MAUVE">#FF76608A</color>
+    <color name="TRANSITION_COLOR_TAUPE">#FF87794E</color>
+
+    <color name="light_grey_background">#E3E4E6</color>
+    <color name="light_grey_text">#FFABABAB</color>
+
+    <color name="ImageSliderBackground">#2C2C2C</color>
+    <color name="video_background_with_overlay">#121212</color>
+
+
+    <color name="default_fallback_color">#FFE51400</color>
+    <color name="default_white">#FFFFFFFF</color>
 
 </resources>

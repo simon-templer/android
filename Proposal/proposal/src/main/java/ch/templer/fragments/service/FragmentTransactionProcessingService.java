@@ -6,9 +6,9 @@ import android.support.v4.app.FragmentTransaction;
 import java.util.List;
 
 import ch.templer.activities.R;
-import ch.templer.fragments.FinishedFragment;
-import ch.templer.fragments.PictureSlideshowFragment;
-import ch.templer.fragments.TextMessagesFragment;
+import ch.templer.fragments.finishfragment.FinishedFragment;
+import ch.templer.fragments.pictureslideshowfragment.PictureSlideshowFragment;
+import ch.templer.fragments.textmessagesfragment.TextMessagesFragment;
 import ch.templer.fragments.mapfragment.MapFragment;
 import ch.templer.fragments.quizfragment.QuizFragment;
 import ch.templer.fragments.selfiefragment.SelfieFragment;
@@ -20,7 +20,7 @@ import ch.templer.model.QuizModel;
 import ch.templer.model.SelfieModel;
 import ch.templer.model.TextMessagesModel;
 import ch.templer.model.VideoFragmentModel;
-import ch.templer.model.data.TestData;
+import ch.templer.services.SettingsService;
 import ch.templer.utils.logging.Logger;
 
 /**
@@ -30,21 +30,25 @@ public class FragmentTransactionProcessingService {
     private static List<AbstractMessageModel> messages;
     private static int fragmentCounter = 0;
     private static Logger log = Logger.getLogger();
+    private static FragmentTransaction currentFragment;
 
-    public static FragmentTransaction prepareNextFragmentTransaction(FragmentTransaction transaction, Context context) {
+    public static void setMessages(List<AbstractMessageModel> messages) {
+        FragmentTransactionProcessingService.messages = messages;
+        fragmentCounter=SettingsService.getInstance().getIntSetting(SettingsService.PREV_SCENARIO_POSITION,0);;
+    }
 
-        if (messages == null) {
-            log.d("initalize Messages", Logger.LOGGER_DEPTH.LOGGER_METHOD);
-            messages = TestData.getInstance(context).getMessages();
-        }
-        if (fragmentCounter >= messages.size()) {
+
+    private static FragmentTransaction getFragmentTransactioFromPosition(FragmentTransaction transaction, Context context, int position) {
+        if (position >= messages.size() || messages == null) {
             log.d("Messages done. Show FinishedFragment", Logger.LOGGER_DEPTH.LOGGER_METHOD);
             FinishedFragment finishedFragment = FinishedFragment.newInstance("", "");
             transaction.replace(R.id.fragment_container, finishedFragment);
+            SettingsService.getInstance().setIntegerSettting(SettingsService.PREV_SCENARIO_POSITION, fragmentCounter);
             fragmentCounter = 0;
             return transaction;
         }
-        AbstractMessageModel message = messages.get(fragmentCounter);
+
+        AbstractMessageModel message = messages.get(position);
         if (message instanceof PictureSlideshowModel) {
             log.d("PictureSlideshowModel found. start PictureSlideshowFragment", Logger.LOGGER_DEPTH.LOGGER_METHOD);
             PictureSlideshowFragment pictureSlideshowFragment = PictureSlideshowFragment.newInstance((PictureSlideshowModel) message);
@@ -70,7 +74,16 @@ public class FragmentTransactionProcessingService {
             VideoFragment videoFragment = VideoFragment.newInstance((VideoFragmentModel) message);
             transaction.replace(R.id.fragment_container, videoFragment);
         }
+        SettingsService.getInstance().setIntegerSettting(SettingsService.PREV_SCENARIO_POSITION,fragmentCounter);
         fragmentCounter++;
         return transaction;
+    }
+
+    public static FragmentTransaction prepareNextFragmentTransaction(FragmentTransaction transaction, Context context) {
+        return getFragmentTransactioFromPosition(transaction, context, fragmentCounter);
+    }
+
+    public static void transactionStarted() {
+        //fragmentCounter++;
     }
 }

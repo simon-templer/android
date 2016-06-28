@@ -1,19 +1,27 @@
 package ch.templer.model;
 
+import android.content.res.Resources;
+
+import ch.templer.fragments.service.ResourceQueryService;
+
 /**
  * Created by Templer on 6/16/2016.
  */
 public class VideoFragmentModel extends AbstractMessageModel {
 
-    private int videoResourceID;
+    private Integer videoResourceID;
     private int fabAppearAnimationTime;
 
-    public int getVideoResourceID() {
+    public Integer getVideoResourceID() {
         return videoResourceID;
     }
 
-    public void setVideoResourceID(int videoResourceID) {
-        this.videoResourceID = videoResourceID;
+    public void setVideoResourceID(String videoResourceID) {
+        try {
+            this.videoResourceID = ResourceQueryService.getRawByName(videoResourceID);
+        } catch (Resources.NotFoundException e) {
+            this.videoResourceID = null;
+        }
     }
 
     public void setFabAppearAnimationTime(int fabAppearAnimationTime) {

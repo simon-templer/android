@@ -19,7 +19,9 @@ import android.widget.TextView;
 import ch.templer.activities.R;
 import ch.templer.animation.FloatingActionButtonTransitionAnimation;
 import ch.templer.controls.reveallayout.RevealLayout;
+import ch.templer.fragments.AbstractFragment;
 import ch.templer.fragments.service.FragmentTransactionProcessingService;
+import ch.templer.model.ColorTheme;
 import ch.templer.model.SelfieModel;
 
 /**
@@ -30,7 +32,7 @@ import ch.templer.model.SelfieModel;
  * Use the {@link SelfieFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SelfieFragment extends Fragment {
+public class SelfieFragment extends AbstractFragment {
     private static final String SELFIE_FRAGMENT_MODEL_ID = "SELFIE_FRAGMENT_MODEL_ID";
 
     private OnFragmentInteractionListener mListener;
@@ -40,6 +42,7 @@ public class SelfieFragment extends Fragment {
     private View mRevealView;
     private RevealLayout mRevealLayout;
     private ImageView imageView;
+    private ColorTheme colorTheme;
 
     public SelfieFragment() {
         // Required empty public constructor
@@ -58,6 +61,7 @@ public class SelfieFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             selfieModel =(SelfieModel) getArguments().getSerializable(SELFIE_FRAGMENT_MODEL_ID);
+            colorTheme= ColorTheme.constructColorTheme(selfieModel.getFragmentColors().getColorThemeType(),this.getContext());
         }
     }
 
@@ -75,12 +79,9 @@ public class SelfieFragment extends Fragment {
         floatingActionButton = (FloatingActionButton) view.findViewById(R.id.floatingButton);
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
-        mRevealView.setBackgroundColor(selfieModel.getNextFragmentBackroundColor());
+        mRevealView.setBackgroundColor(selfieModel.getFragmentColors().getNextFragmentBackroundColor());
 
-        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
-
-        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(floatingActionButton, mRevealView, mRevealLayout, transaction);
-        floatingActionButton.setOnClickListener(floatingActionButtonAnimationOnClickListener);
+        fragmentFinished(floatingActionButton, mRevealView, mRevealLayout);
 
         Button photoButton = (Button) view.findViewById(R.id.photoButton);
         photoButton.setOnClickListener(new View.OnClickListener() {

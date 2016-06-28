@@ -7,11 +7,15 @@ import java.io.Serializable;
  */
 public class Answer implements Serializable{
     String answer;
-    boolean isCorrectAnswer;
+    boolean CorrectAnswer;
+
+    public Answer(){
+
+    }
 
     public Answer(String answer, boolean isCorrectAnswer){
         this.answer = answer;
-        this.isCorrectAnswer = isCorrectAnswer;
+        this.CorrectAnswer = isCorrectAnswer;
     }
 
     public String getAnswer() {
@@ -22,11 +26,11 @@ public class Answer implements Serializable{
         this.answer = answer;
     }
 
-    public boolean isCorrectAnswer() {
-        return isCorrectAnswer;
+    public boolean getCorrectAnswer() {
+        return CorrectAnswer;
     }
 
-    public void setIsCorrectAnswer(boolean isCorrectAnswer) {
-        this.isCorrectAnswer = isCorrectAnswer;
+    public void setCorrectAnswer(boolean isCorrectAnswer) {
+        this.CorrectAnswer = isCorrectAnswer;
     }
 }

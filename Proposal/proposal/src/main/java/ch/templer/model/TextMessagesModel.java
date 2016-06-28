@@ -1,6 +1,12 @@
 package ch.templer.model;
 
+import android.content.res.Resources;
+import android.net.Uri;
+
 import java.util.ArrayList;
+
+import ch.templer.activities.R;
+import ch.templer.fragments.service.ResourceQueryService;
 
 /**
  * Created by Templer on 04.04.2016.
@@ -11,7 +17,7 @@ public class TextMessagesModel extends AbstractMessageModel {
     private int backgrountColorTransitionTime;
     private int textAnimationDuration;
     private int[] backgroundAnimationColors;
-    private int backgroundMusicID;
+    private Integer backgroundMusicID;
 
     public ArrayList<String> getMessages() {
         return messages;
@@ -29,12 +35,12 @@ public class TextMessagesModel extends AbstractMessageModel {
         this.textViewShowTime = textViewShowTime;
     }
 
-    public void setBackgrountColorTransitionTime(int backgrountColorTransitionTime) {
-        this.backgrountColorTransitionTime = backgrountColorTransitionTime;
+    public int getBackgrountColorTransitionTime() {
+        return backgrountColorTransitionTime;
     }
 
-    public int getBackgroundColorTransitionTime() {
-        return backgrountColorTransitionTime;
+    public void setBackgrountColorTransitionTime(int backgrountColorTransitionTime) {
+        this.backgrountColorTransitionTime = backgrountColorTransitionTime;
     }
 
     public int getTextAnimationDuration() {
@@ -49,15 +55,27 @@ public class TextMessagesModel extends AbstractMessageModel {
         return backgroundAnimationColors;
     }
 
-    public void setBackgroundAnimationColors(int[] backgroundAnimationColors) {
-        this.backgroundAnimationColors = backgroundAnimationColors;
+    public void setBackgroundAnimationColors(String[] backgroundAnimationColors) {
+        int[] convertedColors = new int[backgroundAnimationColors.length];
+        for (int i = 0; i < backgroundAnimationColors.length; i++) {
+            try {
+                convertedColors[i] = ResourceQueryService.getColorByName(backgroundAnimationColors[i]);
+            } catch (Resources.NotFoundException e) {
+                convertedColors[i] = R.color.default_fallback_color;
+            }
+        }
+        this.backgroundAnimationColors = convertedColors;
     }
 
-    public int getBackgroundMusicID() {
+    public Integer getBackgroundMusicID() {
         return backgroundMusicID;
     }
 
-    public void setBackgroundMusicID(int backgroundMusicID) {
-        this.backgroundMusicID = backgroundMusicID;
+    public void setBackgroundMusicID(String backgroundMusicID) {
+        try {
+            this.backgroundMusicID = ResourceQueryService.getRawByName(backgroundMusicID);
+        } catch (Resources.NotFoundException e) {
+            this.backgroundMusicID = null;
+        }
     }
 }

@@ -21,4 +21,27 @@
     <string name="map_fragment_gps_unavailable_error_message">Please activate your location service to use the full functionality of this application.</string>
 
     <string name="alert_dialog_title">Please Wait</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_general_summary">Allows a user to immediately move between scenario screens. This might jeopardize the scenario experience</string>
+    <string name="pref_general_title">Enable debugging mode</string>
+
+    <string name="title_activity_menu">MenuActivity</string>
+
+    <string name="create_shortcut">Create shortcut</string>
+    <string name="open_shortcut">Open Scenario</string>
+    <string name="snackbar_continue_button">Continue</string>
+    <string name="snackbar_dismiss_button">Dismiss</string>
+    <string name="snackbar_old_scenario_found_message">A previous Scenario was not finished, do you want to continue?</string>
+    <string name="snackbar_shortcut_created">Shortcut successfully created</string>
+
+    <string name="finished_fragment_congratulation">Congratulations, you finished this scenario!</string>
+
+
 </resources>

@@ -36,17 +36,17 @@
     </style>
 
     <declare-styleable name="FABToolbarLayout">
-        <attr name="showDuration" format="integer"/>
-        <attr name="hideDuration" format="integer"/>
-        <attr name="verticalMargin" format="dimension"/>
-        <attr name="horizontalMargin" format="dimension"/>
-        <attr name="fadeInPivotX" format="dimension"/>
-        <attr name="fadeInPivotY" format="dimension"/>
-        <attr name="fadeInFraction" format="float"/>
-        <attr name="fabId" format="reference"/>
-        <attr name="containerId" format="reference"/>
-        <attr name="fabToolbarId" format="reference"/>
-        <attr name="fabDrawableAnimationEnabled" format="boolean"/>
+        <attr name="showDuration" format="integer" />
+        <attr name="hideDuration" format="integer" />
+        <attr name="verticalMargin" format="dimension" />
+        <attr name="horizontalMargin" format="dimension" />
+        <attr name="fadeInPivotX" format="dimension" />
+        <attr name="fadeInPivotY" format="dimension" />
+        <attr name="fadeInFraction" format="float" />
+        <attr name="fabId" format="reference" />
+        <attr name="containerId" format="reference" />
+        <attr name="fabToolbarId" format="reference" />
+        <attr name="fabDrawableAnimationEnabled" format="boolean" />
     </declare-styleable>
 
     <style name="alert_dialog_color_theme_turquise" parent="android:Theme.DeviceDefault.Dialog">
@@ -68,6 +68,11 @@
         <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
         <item name="DialogSpotColor">@color/PALETTE_DEEPPURPLE_MAIN_TEXT_COLOR</item>
         <item name="DialogSpotCount">8</item>
+    </style>
+
+
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen_drawable</item>
     </style>
 
 </resources>

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 import ch.templer.activities.R;
@@ -21,6 +23,7 @@ public class ColorTheme implements Serializable{
     private int FragmentBackgroundColor;
     private int SecondaryColor;
     private int SecondaryTextColor;
+    private String alerDialogStyle;
 
     private static int WHITE = Color.argb(255, 255, 255, 255);
 
@@ -32,7 +35,7 @@ public class ColorTheme implements Serializable{
     private static int PALETTE_TURQOUISE_SECONDARY_COLOR = Color.argb(255, 0, 93, 111);
     private static int PALETTE_TURQOUISE_SECONDARY_TEXT_COLOR = WHITE;
 
-    private String alerDialogStyle;
+
 
     private ColorTheme(){
     }
@@ -105,5 +108,37 @@ public class ColorTheme implements Serializable{
 
     public int getSecondaryTextColor() {
         return SecondaryTextColor;
+    }
+
+    public void setThirdaryTextColor(int thirdaryTextColor) {
+        ThirdaryTextColor = thirdaryTextColor;
+    }
+
+    public void setThirdaryColor(int thirdaryColor) {
+        ThirdaryColor = thirdaryColor;
+    }
+
+    public void setMainTextColor(int mainTextColor) {
+        MainTextColor = mainTextColor;
+    }
+
+    public void setMainColor(int mainColor) {
+        MainColor = mainColor;
+    }
+
+    public void setFragmentBackgroundColor(int fragmentBackgroundColor) {
+        FragmentBackgroundColor = fragmentBackgroundColor;
+    }
+
+    public void setSecondaryColor(int secondaryColor) {
+        SecondaryColor = secondaryColor;
+    }
+
+    public void setSecondaryTextColor(int secondaryTextColor) {
+        SecondaryTextColor = secondaryTextColor;
+    }
+
+    public void setAlerDialogStyle(String alerDialogStyle) {
+        this.alerDialogStyle = alerDialogStyle;
     }
 }

@@ -1,0 +1,389 @@
+[
+  {
+    "id": 1,
+    "scenarioTitle": "Complete Scenario",
+    "secondaryTitle": "For test purposes",
+    "description": "This scenario demonstrates all available views supported by this application. each and every View fullfills adifferent purpose to engage a user. Views for slidesdhows, videos Conversations, Locations and Quizes are avaiable.Each View can configure a different color theme.",
+    "iconId": "img_6786",
+    "messages": [
+      {
+        "@type": "QuizModel",
+        "fabAppearAnimationTime": 1000,
+        "title": "Quiz 1 - Easy",
+        "qandAs": [
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 0",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 0",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 0",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 0",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 0"
+          },
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 1",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 1",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 1",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 1",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 1"
+          },
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 2",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 2",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 2",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 2",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 2"
+          },
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 3",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 3",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 3",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 3",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 3"
+          }
+        ],
+        "FragmentColors": {
+          "colorThemeType": "TURQOUISE",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_AMBER"
+        }
+      },
+      {
+        "@type": "TextMessagesModel",
+        "backgroundAnimationColors": [
+          "TRANSITION_COLOR_AMBER",
+          "TRANSITION_COLOR_EMERALD",
+          "TRANSITION_COLOR_INDIGO",
+          "TRANSITION_COLOR_CRIMSON",
+          "TRANSITION_COLOR_YELLOW",
+          "TRANSITION_COLOR_MAUVE"
+        ],
+        "backgroundMusicID": "adelle_hello",
+        "messages": [
+          "Hallo Mein Schatz",
+          "auf gehts..."
+        ],
+        "textAnimationDuration": 3000,
+        "textViewShowTime": 3000,
+        "backgrountColorTransitionTime": 3000,
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "nextFragmentBackroundColor": "ImageSliderBackground"
+        }
+      },
+      {
+        "@type": "PictureSlideshowModel",
+        "imageIDs": [
+          "img_6786",
+          "img_6787",
+          "img_6788",
+          "img_6792",
+          "img_6797",
+          "img_6712",
+          "img_6869",
+          "img_6870"
+        ],
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "ImageSliderBackground",
+          "nextFragmentBackroundColor": "default_white"
+        }
+      },
+      {
+        "@type": "MapLocationModel",
+        "latitude": 46.979631,
+        "longitude": 7.456857,
+        "minDistance": 0,
+        "radius": 3,
+        "timeInterval": 0,
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "default_white",
+          "nextFragmentBackroundColor": "video_background_with_overlay"
+        }
+      },
+      {
+        "@type": "VideoFragmentModel",
+        "fabAppearAnimationTime": 1000,
+        "videoResourceID": "video1",
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "ImageSliderBackground",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_CYAN"
+        }
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "scenarioTitle": "Quiz Fragment Test Scenario",
+    "messages": [
+      {
+        "@type": "QuizModel",
+        "fabAppearAnimationTime": 1000,
+        "title": "Quiz 1 - Easy",
+        "qandAs": [
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 0",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 0",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 0",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 0",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 0"
+          },
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 1",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 1",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 1",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 1",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 1"
+          },
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 2",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 2",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 2",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 2",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 2"
+          },
+          {
+            "answers": [
+              {
+                "answer": "Carrot orange test test long test long 3",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Blue 3",
+                "correctAnswer": true
+              },
+              {
+                "answer": "Brown 3",
+                "correctAnswer": false
+              },
+              {
+                "answer": "Grey 3",
+                "correctAnswer": false
+              }
+            ],
+            "correctMessage": "That is Correct",
+            "wrongMessage": "That is incorrect",
+            "question": "You surly know the color of my eyes You surly know the color of my eyes? 3"
+          }
+        ],
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_CYAN"
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "scenarioTitle": "Text Messages test Scenario",
+    "messages": [
+      {
+        "@type": "TextMessagesModel",
+        "backgroundAnimationColors": [
+          "TRANSITION_COLOR_AMBER",
+          "TRANSITION_COLOR_EMERALD",
+          "TRANSITION_COLOR_INDIGO",
+          "TRANSITION_COLOR_CRIMSON",
+          "TRANSITION_COLOR_YELLOW",
+          "TRANSITION_COLOR_MAUVE"
+        ],
+        "backgroundMusicID": "adelle_hello",
+        "messages": [
+          "Hallo Mein Schatz",
+          "auf gehts..."
+        ],
+        "textAnimationDuration": 3000,
+        "textViewShowTime": 3000,
+        "backgrountColorTransitionTime": 3000,
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_CYAN"
+        }
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "scenarioTitle": "Picture Slideshow Test Scenario",
+    "messages": [
+      {
+        "@type": "PictureSlideshowModel",
+        "imageIDs": [
+          "img_6786",
+          "img_6787",
+          "img_6788",
+          "img_6792",
+          "img_6797",
+          "img_6712",
+          "img_6869",
+          "img_6870"
+        ],
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "ImageSliderBackground",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_CYAN"
+        }
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "scenarioTitle": "Selfie Test Scenario",
+    "messages": [
+      {
+        "@type": "SelfieModel",
+        "description": "Test Description to take a selfie!!!",
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_CYAN"
+        }
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "scenarioTitle": "MapFragment Test Scenario",
+    "messages": [
+      {
+        "@type": "MapLocationModel",
+        "latitude": 46.979631,
+        "longitude": 7.456857,
+        "minDistance": 0,
+        "radius": 3,
+        "timeInterval": 0,
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "default_white",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_CYAN"
+        }
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "scenarioTitle": "Video Fragment Test Scenario",
+    "messages": [
+      {
+        "@type": "VideoFragmentModel",
+        "fabAppearAnimationTime": 1000,
+        "videoResourceID": "video1",
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "ImageSliderBackground",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_CYAN"
+        }
+      }
+    ]
+  }
+]

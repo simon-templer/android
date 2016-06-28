@@ -103,4 +103,10 @@ public class TextFadeInOutAnimation {
     public void setAnimationFinishedListener(AnimationFinishedListener animationFinishedListener) {
         this.animationFinishedListener = animationFinishedListener;
     }
+
+    public void stop() {
+        if (textView != null){
+            textView.clearAnimation();
+        }
+    }
 }

@@ -15,7 +15,7 @@ public class QuizModel extends AbstractMessageModel {
         return QAndAs;
     }
 
-    public void setQAndA(List<QuestionAndAnswers> QAndAs) {
+    public void setQAndAs(List<QuestionAndAnswers> QAndAs) {
         this.QAndAs = QAndAs;
     }
 

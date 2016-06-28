@@ -6,11 +6,18 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 
+import ch.templer.activities.scenarioselectionactivity.ScenarioSelectionActivity;
+import ch.templer.fragments.IFragmentInteractionListener;
 import ch.templer.fragments.service.FragmentTransactionProcessingService;
+import ch.templer.model.Scenario;
+import ch.templer.utils.logging.Logger;
 
-public class FragmentContainerActivity extends FragmentActivity implements IFragmentInteractionListener, View.OnClickListener {
+public class FragmentContainerActivity extends FragmentActivity implements IFragmentInteractionListener {
+
+    private Scenario scenario;
+    private static int fragmentCounter = 0;
+    private static Logger log = Logger.getLogger();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +33,10 @@ public class FragmentContainerActivity extends FragmentActivity implements IFrag
             }
         }
 
-        Button nextFragmentButton = (Button) findViewById(R.id.next_fragment_button);
-        nextFragmentButton.setOnClickListener(this);
+        scenario = (Scenario)getIntent().getSerializableExtra(ScenarioSelectionActivity.SCENARIO_EXTRA_ID);
 
-        FragmentTransactionProcessingService.prepareNextFragmentTransaction(getSupportFragmentManager().beginTransaction(),this).commit();
+        FragmentTransactionProcessingService.setMessages(scenario.getMessages());
+        FragmentTransactionProcessingService.prepareNextFragmentTransaction(getSupportFragmentManager().beginTransaction(), this).commit();
     }
 
     @Override
@@ -47,15 +54,18 @@ public class FragmentContainerActivity extends FragmentActivity implements IFrag
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        //ignored
+    }
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
 
-    @Override
-    public void onClick(View v) {
-
-        FragmentTransactionProcessingService.prepareNextFragmentTransaction(getSupportFragmentManager().beginTransaction(),this).commit();
+    public void goBack() {
+        super.onBackPressed();
     }
 }

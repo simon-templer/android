@@ -19,9 +19,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,16 +48,18 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.templer.activities.R;
+import ch.templer.activities.settingsactivity.SettingsActivity;
 import ch.templer.animation.FabTransformAnimation;
-import ch.templer.animation.FloatingActionButtonTransitionAnimation;
 import ch.templer.animation.ViewAppearAnimation;
 import ch.templer.controls.alertdialog.SpotsDialog;
 import ch.templer.controls.fab.fabtoolbarlayout.FABToolbarLayout;
 import ch.templer.controls.listener.AnimationFinishedListener;
 import ch.templer.controls.reveallayout.RevealLayout;
-import ch.templer.fragments.service.FragmentTransactionProcessingService;
+import ch.templer.fragments.AbstractFragment;
 import ch.templer.fragments.service.SnackbarService;
+import ch.templer.model.ColorTheme;
 import ch.templer.model.MapLocationModel;
+import ch.templer.services.SettingsService;
 import ch.templer.services.multimedia.SoundService;
 import ch.templer.services.navigation.Navigator;
 import ch.templer.services.navigation2.AbstractRouting;
@@ -69,7 +69,7 @@ import ch.templer.services.navigation2.Routing;
 import ch.templer.services.navigation2.RoutingListener;
 import ch.templer.utils.logging.Logger;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
+public class MapFragment extends AbstractFragment implements OnMapReadyCallback, View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, RoutingListener {
     //Staticidentifier
     private static final String MAP_FRAGMENT_MODEL_ID = "MAP_FRAGMENT_MODEL_ID";
@@ -77,6 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     private static final String CURRENT_LATITUDE = "CURRENT_LATITUDE";
     private static final String CURRENT_LONGITUTE = "CURRENT_LONGITUTE";
     private static final String IS_FABTOOLBARLAYOUT_SHOWN = "IS_FABTOOLBARLAYOUT_SHOWN";
+    private static final String IS_LOCATION_REACHED_ID = "IS_LOCATION_REACHED_ID";
 
     //UI member variables
     private View mRevealView;
@@ -115,11 +116,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     private String currentSnackbarDescription;
     private MapLocationModel mapLocationModel;
     private boolean isFabToolbarLayoutShown = false;
-    private boolean isLocationReached = false;
     private int polylineColor = Color.rgb(66, 133, 244);
     private Handler mHandler = new Handler();
     public OnFragmentInteractionListener mListener;
     private static Logger log = Logger.getLogger();
+    private ColorTheme colorTheme;
 
     public MapFragment() {
 
@@ -138,6 +139,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mapLocationModel = (MapLocationModel) getArguments().getSerializable(MAP_FRAGMENT_MODEL_ID);
+            colorTheme= ColorTheme.constructColorTheme(mapLocationModel.getFragmentColors().getColorThemeType(),this.getContext());
         }
         destinationLocation = new Location(getString(R.string.map_fragment_destination_title));
         destinationLocation.setLatitude(mapLocationModel.getLatitude());
@@ -170,18 +172,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         //setup UI
         mRevealLayout = (RevealLayout) view.findViewById(R.id.reveal_layout);
         mRevealView = view.findViewById(R.id.reveal_view);
-        mRevealView.setBackgroundColor(mapLocationModel.getNextFragmentBackroundColor());
+        mRevealView.setBackgroundColor(mapLocationModel.getFragmentColors().getNextFragmentBackroundColor());
 
         fabToolbarLayout = (FABToolbarLayout) view.findViewById(R.id.fabtoolbar);
         fabtoolbar_fab = (FloatingActionButton) view.findViewById(R.id.fabtoolbar_fab);
-        fabtoolbar_fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_navigation_white_40dp, null));
-        fabtoolbar_fab.setBackgroundTintList(ColorStateList.valueOf(mapLocationModel.getFragmentColors().getColorTheme().getMainColor()));
-        fabtoolbar_fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fabToolbarLayout.show();
+        boolean debuggingEnabled = SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false);
+        if (!this.fragmentFinished || debuggingEnabled){
+            fabtoolbar_fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_navigation_white_40dp, null));
+            fabtoolbar_fab.setBackgroundTintList(ColorStateList.valueOf(colorTheme.getMainColor()));
+            fabtoolbar_fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fabToolbarLayout.show();
+                }
+            });
+            if (debuggingEnabled){
+                fabToolbarLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finishNavigation();
+                    }
+                }, 5000);
             }
-        });
+        }else{
+            fabtoolbar_fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_forward_24dp, null));
+            fabtoolbar_fab.setBackgroundTintList(ColorStateList.valueOf(colorTheme.getMainColor()));
+            prepareNextFragmentNavigation();
+        }
+
 
         refresh = (ImageView) view.findViewById(R.id.refresh);
         car = (ImageView) view.findViewById(R.id.car);
@@ -202,22 +220,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         supportMapFragment.getMapAsync(this);
 
         //check if GPS is available/active
-        checkPSEnabled();
-
-        fabToolbarLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                finishNavigation();
-            }
-        },5000);
+        checkGPSEnabled();
 
         return view;
     }
 
-    private void checkPSEnabled() {
+    private void checkGPSEnabled() {
         LocationManager lm = (LocationManager) this.getContext().getSystemService(Context.LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) && !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            SnackbarService.showSnackbar(this.getContext(), coordinatorLayout,mapLocationModel.getFragmentColors().getColorTheme().getMainColor(), getString(R.string.map_fragment_gps_unavailable_error_message), Snackbar.LENGTH_INDEFINITE, true);
+            SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, colorTheme.getMainColor(), getString(R.string.map_fragment_gps_unavailable_error_message), Snackbar.LENGTH_INDEFINITE, true);
         }
     }
 
@@ -308,6 +319,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         //restore FabToolbarLayout if allready shown
 //        if (isFabToolbarLayoutShown){
 //            fabToolbarLayout.show();
+//            fabToolbarLayout.show();
 //        }
 
         // complete view appear animation
@@ -365,7 +377,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     // The immersive fullscreen mode of Android does not work correctly with a Dialog because the window focus changes
     // and forces a appearance of the soft buttons. To avoid this you have to set the new dialog as non focusable
     private void showProgressDialog() {
-        int styleID = getResources().getIdentifier(mapLocationModel.getFragmentColors().getColorTheme().getAlerDialogStyle(), "style", getContext().getPackageName());
+        int styleID = getResources().getIdentifier(colorTheme.getAlerDialogStyle(), "style", getContext().getPackageName());
         progressDialog = new SpotsDialog(this.getContext(), getString(R.string.alert_dialog_title), styleID);
         //Set the dialog to not focusable (makes navigation ignore us adding the window)
         progressDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
@@ -400,8 +412,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(1000); // Update location every second
 
-        //set this class as LocationListener
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        if (!this.fragmentFinished){
+            //set this class as LocationListener
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
 
         //retrieve last location
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
@@ -423,8 +437,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
         // check if location is within the destination radius
-        if (location.distanceTo(destinationLocation) <= mapLocationModel.getRadius() && !isLocationReached) {
-            isLocationReached = true;
+        if (location.distanceTo(destinationLocation) <= mapLocationModel.getRadius() && !fragmentFinished) {
+            //this avoid more onLocationChanged events of entering this if clause
             finishNavigation();
         }
     }
@@ -440,7 +454,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
         SoundService.playSound(this.getContext(), R.raw.navigation_success);
         Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
         v.vibrate(pattern, -1);
-        SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, mapLocationModel.getFragmentColors().getColorTheme().getSecondaryColor(), getString(R.string.map_fragment_location_reached_message), Snackbar.LENGTH_INDEFINITE, false);
+        SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, colorTheme.getSecondaryColor(), getString(R.string.map_fragment_location_reached_message), Snackbar.LENGTH_INDEFINITE, false);
 
         //transform animation. Animation is delayed, because of the user feedback above takes some time (Especially the toolbar hide animation)
         fabToolbarLayout.postDelayed(new Runnable() {
@@ -452,14 +466,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
                 fabTransformAnimation.setAnimationFinishedListener(new AnimationFinishedListener() {
                     @Override
                     public void onAnimationFinished() {
-                        FragmentTransaction transaction = FragmentTransactionProcessingService.prepareNextFragmentTransaction(getFragmentManager().beginTransaction(),getContext());
-                        FloatingActionButtonTransitionAnimation floatingActionButtonAnimationOnClickListener = new FloatingActionButtonTransitionAnimation(fabtoolbar_fab, mRevealView, mRevealLayout, SnackbarService.getSnackbar(), transaction);
-                        fabtoolbar_fab.setOnClickListener(floatingActionButtonAnimationOnClickListener);
+                        prepareNextFragmentNavigation();
                     }
                 });
                 fabTransformAnimation.runAnimation();
             }
         }, 500);
+    }
+
+
+    private void prepareNextFragmentNavigation() {
+        fragmentFinished(fabtoolbar_fab, mRevealView, mRevealLayout);
     }
 
     @Override
@@ -482,7 +499,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     @Override
     public void onRoutingFailure(RouteException e) {
         progressDialog.dismiss();
-        SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, mapLocationModel.getFragmentColors().getColorTheme().getSecondaryColor(), getString(R.string.map_fragment_connection_error_message), Snackbar.LENGTH_INDEFINITE, true);
+        SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, colorTheme.getSecondaryColor(), getString(R.string.map_fragment_connection_error_message), Snackbar.LENGTH_INDEFINITE, true);
     }
 
     @Override
@@ -507,7 +524,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
                 fabToolbarLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        SnackbarService.showSnackbar(getContext(), coordinatorLayout, mapLocationModel.getFragmentColors().getColorTheme().getSecondaryColor(), currentSnackbarDescription, Snackbar.LENGTH_INDEFINITE, false);
+                        SnackbarService.showSnackbar(getContext(), coordinatorLayout, colorTheme.getSecondaryColor(), currentSnackbarDescription, Snackbar.LENGTH_INDEFINITE, false);
                     }
                 }, 500);
 
