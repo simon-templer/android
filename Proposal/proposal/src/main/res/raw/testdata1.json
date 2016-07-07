@@ -11,7 +11,7 @@
         "backgroundAnimationColors": [
           "TRANSITION_COLOR_AMBER",
           "TRANSITION_COLOR_EMERALD",
-          "TRANSITION_COLOR_INDIGO",a
+          "TRANSITION_COLOR_INDIGO",
           "TRANSITION_COLOR_CRIMSON",
           "TRANSITION_COLOR_YELLOW",
           "TRANSITION_COLOR_MAUVE"
@@ -22,8 +22,7 @@
           "Wie geht es dir?",
           "Ich vermisse dich wirklich sehr...",
           "Zum Glück gehen wir bald in den Urlaub und ich habe dich dann zwei Wochen nur für mich!",
-          "Um dir die Wartezeit bis dahin etwas zu verkürzen habe ich dir ein kleines Abenteuer vorberetet^^",
-          "Unsere gemeinsame Geschichte :-)",
+          "Um dir die Wartezeit bis dahin etwas zu verkürzen möchte ich dir ein kleines Geschichte erzählen^^",
           "Ich hoffe du hast ein wenig Zeit raus zu gehen?",
           "Zieh dir daher bitte passende Klamotten an, da wir schon ein wenig unterwegs sein werden...",
           "Bevor es aber Los geht habe ich noch ein paar kleine Spielregeln:",
@@ -33,9 +32,139 @@
           "Ohh genau, ich gratuliere dir zu deinem brandneuen Samsung Galaxy S7 :-)",
           "2. Folge genau den Anweisung der App.",
           "3. Hab ganz viel spass und gute Unterhaltung!! ",
-          "Genug der Worte...",
           "Wenn du soweit bist machen wir uns auf den Weg :-)",
-          "Viel Spass!"
+          "Vorhang auf...",
+          "Kapitel 1 - Die Begegnug",
+          "Es war einmal..."
+        ],
+        "textAnimationDuration": 3000,
+        "textViewShowTime": 4000,
+        "backgrountColorTransitionTime": 3000,
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "nextFragmentBackroundColor": "default_white"
+        }
+      },
+      {
+        "@type": "PictureSlideshowModel",
+        "images": [
+          {
+            "imageID": "anastasiia_slideshow_1_bild_1",
+            "description": "...ein junges sehr hübsches Mädchen, aus einem weit entfernten Land."
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_2",
+            "description": "Ihr Name ist Anastassia Vasylivna Shelukhina und sie ist vor nicht alzu langer Zeit umgezogen..."
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_3",
+            "description": "Anastasiia hatte viele tolle Hobbies, wie zum Beispiel Autos..."
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_4",
+            "description": "Aber auch Kreative dinge wie malen, tanzen, singen, Gitarre spielen und basteln"
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_5",
+            "description": "Anastasiia hatte einmalige Charakterzüge, die sie wirklich zu einem besonderen Menschen macht..."
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_6",
+            "description": "Sie ist Stark!"
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_7",
+            "description": "Und mutig, genug sich mit Deathtroopern anzulegen!?"
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_8",
+            "description": "Zielgerichtet und genau."
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_9",
+            "description": "und eine ganz süsse?"
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_10",
+            "description": "Auf dem Mund gefallen sie sicherlich auch nicht, da sie immer einen weg findet sich gehör zu verschaffen :-)"
+          },
+          {
+            "imageID": "anastasiia_slideshow_1_bild_11",
+            "description": "Anastasiia ist auch ein totale Siegertüp. Rundum also ein toller fang!"
+          }
+        ],
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "ImageSliderBackground",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_AMBER"
+        }
+      },
+      {
+        "@type": "TextMessagesModel",
+        "backgroundAnimationColors": [
+          "TRANSITION_COLOR_AMBER",
+          "TRANSITION_COLOR_EMERALD",
+          "TRANSITION_COLOR_INDIGO",
+          "TRANSITION_COLOR_CRIMSON",
+          "TRANSITION_COLOR_YELLOW",
+          "TRANSITION_COLOR_MAUVE"
+        ],
+        "backgroundMusicID": "adelle_hello",
+        "messages": [
+          "Unweit entfernt lebte ein stattlicher und unglaublich gutaussehedner ;-) junger Mann!",
+          "Er tristete ein sehr trostloses Leben, da er ausser Sport und Computer nicht viel kennt... ",
+          "Der junge Mann konnte nicht sagen, dass er unglücklich war, dennoch spürte er, dass ihm etwas wichtiges in seinem Leben fehlte..."
+        ],
+        "textAnimationDuration": 3000,
+        "textViewShowTime": 4000,
+        "backgrountColorTransitionTime": 3000,
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "nextFragmentBackroundColor": "default_white"
+        }
+      },
+      {
+        "@type": "PictureSlideshowModel",
+        "images": [
+          {
+            "imageID": "anastasiia_slideshow_2_bild_1",
+            "description": "Der junge statliche Mann heisst Simon und ist eine sehr ruhige Persönlichkeit."
+          },
+          {
+            "imageID": "anastasiia_slideshow_2_bild_2",
+            "description": "Simon ist daher auch ein sehr nachdenklicher und besonnener Typ."
+          },
+          {
+            "imageID": "anastasiia_slideshow_2_bild_3",
+            "description": "Er ist ein sehr Naturverbundener und abenteuerlicher Mensch, der gerne auf Reisen geht!"
+          },
+          {
+            "imageID": "anastasiia_slideshow_2_bild_4",
+            "description": "Simon ist ebenfalls ein toller fang."
+          }
+        ],
+        "FragmentColors": {
+          "colorThemeType": "DEEPPURPLE",
+          "fragmentBackgroundColor": "ImageSliderBackground",
+          "nextFragmentBackroundColor": "TRANSITION_COLOR_AMBER"
+        }
+      },
+      {
+        "@type": "TextMessagesModel",
+        "backgroundAnimationColors": [
+          "TRANSITION_COLOR_AMBER",
+          "TRANSITION_COLOR_EMERALD",
+          "TRANSITION_COLOR_INDIGO",
+          "TRANSITION_COLOR_CRIMSON",
+          "TRANSITION_COLOR_YELLOW",
+          "TRANSITION_COLOR_MAUVE"
+        ],
+        "backgroundMusicID": "adelle_hello",
+        "messages": [
+          "Zu beginn unserer Geschichte lebten unsere beiden Helden unweit auseinander, doch sind sie sich noch nie begegnet.",
+          "Beide ahnen nicht, dass sich ihre wege schon bald kreuzen sollten...",
+          "Auf der suche nach Arbeit und beruflichen perspektiven verschlug es beide Helden in das kleine verschlaffene Städchen Böblingen.",
+          "Simon began seine Arbeit noch alleine, er sollte aber schon bald eine sehr positive Überraschung erleben..."
         ],
         "textAnimationDuration": 3000,
         "textViewShowTime": 4000,
@@ -47,8 +176,8 @@
       },
       {
         "@type": "MapLocationModel",
-        "latitude": 48.656033,
-        "longitude": 8.935451,
+        "latitude": 48.686452,
+        "longitude": 9.006039,
         "minDistance": 3,
         "radius": 10,
         "timeInterval": 1000,
@@ -709,7 +838,7 @@
     ]
   },
   {
-    "id": 2,
+    "id": 1,
     "scenarioTitle": "Complete Scenario",
     "secondaryTitle": "For test purposes",
     "description": "This scenario demonstrates all available views supported by this application. each and every View fullfills adifferent purpose to engage a user. Views for slidesdhows, videos Conversations, Locations and Quizes are avaiable.Each View can configure a different color theme.",
@@ -897,7 +1026,7 @@
     ]
   },
   {
-    "id": 3,
+    "id": 2,
     "scenarioTitle": "Quiz Fragment Test Scenario",
     "messages": [
       {
@@ -1006,7 +1135,7 @@
     ]
   },
   {
-    "id": 4,
+    "id": 3,
     "scenarioTitle": "Text Messages test Scenario",
     "messages": [
       {
@@ -1035,7 +1164,7 @@
     ]
   },
   {
-    "id": 5,
+    "id": 4,
     "scenarioTitle": "Picture Slideshow Test Scenario",
     "messages": [
       {
@@ -1072,7 +1201,7 @@
     ]
   },
   {
-    "id": 6,
+    "id": 5,
     "scenarioTitle": "Selfie Test Scenario",
     "messages": [
       {
@@ -1086,7 +1215,7 @@
     ]
   },
   {
-    "id": 7,
+    "id": 6,
     "scenarioTitle": "MapFragment Test Scenario",
     "messages": [
       {
@@ -1105,7 +1234,7 @@
     ]
   },
   {
-    "id": 8,
+    "id": 7,
     "scenarioTitle": "Video Fragment Test Scenario",
     "messages": [
       {
