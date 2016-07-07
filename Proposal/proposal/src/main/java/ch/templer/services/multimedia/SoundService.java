@@ -10,17 +10,21 @@ import ch.templer.utils.logging.Logger;
  * Created by Templer on 5/6/2016.
  */
 public class SoundService {
-    private static MediaPlayer mediaPlayer;
-    private static int currentSong = 0;
-    private static int currentSongPosition = 0;
-    private static int songId;
-    private static Context soundServiceContext;
-    private static CompletionListener completionListener = new CompletionListener();
-    private static boolean isPlayerReleased = true;
-    private static int length;
-    private static Logger log = Logger.getLogger();
+    private MediaPlayer mediaPlayer;
+    private int currentSong = 0;
+    private int currentSongPosition = 0;
+    private int songId;
+    private CompletionListener completionListener = new CompletionListener();
+    private boolean isPlayerReleased = true;
+    private int length;
+    private Logger log = Logger.getLogger();
+    Context context;
 
-    private static MediaPlayer newMediaPlayerInstance(Context context, int id) {
+    public SoundService (Context context){
+        this.context = context;
+    }
+
+    private MediaPlayer newMediaPlayerInstance(int id) {
         if (mediaPlayer != null) {
             // flag hast to be set, because a seperate thread can call other service methods in the meantime
             isPlayerReleased = true;
@@ -33,54 +37,54 @@ public class SoundService {
         return MediaPlayer.create(context, id);
     }
 
-    public static void playSound(Context context, int id) {
-        playSound(context, id, 0);
+    public void playSound(int id) {
+
+        playSound(id, 0);
     }
 
-    public static void playSound(Context context, int id, int songPosition) {
+    public void playSound(int id, int songPosition) {
         currentSong = 0;
         songId = id;
-        soundServiceContext = context;
         currentSongPosition = songPosition;
-        httpGetAsynchTask httpGetAsyncTask = new httpGetAsynchTask();
+        PlaySoundAsyncTask httpGetAsyncTask = new PlaySoundAsyncTask();
         httpGetAsyncTask.execute();
 
     }
-    public static void pause() {
+    public void pause() {
         if (mediaPlayer != null && !isPlayerReleased) {
             length = mediaPlayer.getCurrentPosition();
             mediaPlayer.pause();
         }
     }
 
-    public static void resume() {
+    public void resume() {
         if (mediaPlayer != null && !isPlayerReleased) {
             mediaPlayer.seekTo(length);
-            playSound(soundServiceContext, songId, length);
+            playSound(songId, length);
         }
     }
 
-    public static void stop() {
+    public void stop() {
         if (mediaPlayer != null && !isPlayerReleased) {
             mediaPlayer.stop();
         }
     }
 
-    public static boolean isPlaying() {
+    public boolean isPlaying() {
         if (mediaPlayer != null && !isPlayerReleased) {
             return mediaPlayer.isPlaying();
         }
         return false;
     }
 
-    public static int getSongPosition(){
+    public int getSongPosition(){
         if (mediaPlayer != null && !isPlayerReleased) {
             return mediaPlayer.getCurrentPosition();
         }
         return 0;
     }
 
-    static class httpGetAsynchTask extends AsyncTask<String,Integer, Void>
+    class PlaySoundAsyncTask extends AsyncTask<String,Integer, Void>
     {
 
         protected void onPreExdcute()
@@ -91,7 +95,7 @@ public class SoundService {
         @Override
         protected Void doInBackground(String... arg0)
         {
-            mediaPlayer = newMediaPlayerInstance(soundServiceContext, songId);
+            mediaPlayer = newMediaPlayerInstance(songId);
             mediaPlayer.seekTo(currentSongPosition);
             //mediaPlayer.setLooping(true);
             mediaPlayer.start();
@@ -106,7 +110,7 @@ public class SoundService {
 
     }
 
-    private static class CompletionListener implements MediaPlayer.OnCompletionListener {
+    private class CompletionListener implements MediaPlayer.OnCompletionListener {
 
         @Override
         public void onCompletion(MediaPlayer mp) {

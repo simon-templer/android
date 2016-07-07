@@ -60,10 +60,14 @@
     <color name="TRANSITION_COLOR_TAUPE">#FF87794E</color>
 
     <color name="light_grey_background">#E3E4E6</color>
+    <color name="dark_grey_background">#9b000000</color>
+
     <color name="light_grey_text">#FFABABAB</color>
 
     <color name="ImageSliderBackground">#2C2C2C</color>
     <color name="video_background_with_overlay">#121212</color>
+    <color name="background_overley">#96000000</color>
+
 
 
     <color name="default_fallback_color">#FFE51400</color>

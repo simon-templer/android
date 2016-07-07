@@ -2,6 +2,8 @@ package ch.templer.model;
 
 import android.content.res.Resources;
 
+import java.util.List;
+
 import ch.templer.activities.R;
 import ch.templer.fragments.service.ResourceQueryService;
 
@@ -14,22 +16,13 @@ public class PictureSlideshowModel extends AbstractMessageModel {
 
     }
 
-    private int[] imageIDs;
+    private List<ImageData> images;
 
-    public int[] getImageIDs() {
-        return imageIDs;
+    public List<ImageData> getImages() {
+        return images;
     }
 
-    public void setImageIDs(String[] imageIDs) {
-
-        int[] convertedImageIds = new int[imageIDs.length];
-        for (int i = 0; i < imageIDs.length; i++) {
-            try {
-                convertedImageIds[i] = ResourceQueryService.getDrawableByName(imageIDs[i]);
-            } catch (Resources.NotFoundException e) {
-                convertedImageIds[i] = R.drawable.unknown_icon;
-            }
-        }
-        this.imageIDs = convertedImageIds;
+    public void setImages(List<ImageData> images) {
+        this.images = images;
     }
 }

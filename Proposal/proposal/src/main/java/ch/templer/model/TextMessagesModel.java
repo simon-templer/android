@@ -17,7 +17,6 @@ public class TextMessagesModel extends AbstractMessageModel {
     private int backgrountColorTransitionTime;
     private int textAnimationDuration;
     private int[] backgroundAnimationColors;
-    private Integer backgroundMusicID;
 
     public ArrayList<String> getMessages() {
         return messages;
@@ -65,17 +64,5 @@ public class TextMessagesModel extends AbstractMessageModel {
             }
         }
         this.backgroundAnimationColors = convertedColors;
-    }
-
-    public Integer getBackgroundMusicID() {
-        return backgroundMusicID;
-    }
-
-    public void setBackgroundMusicID(String backgroundMusicID) {
-        try {
-            this.backgroundMusicID = ResourceQueryService.getRawByName(backgroundMusicID);
-        } catch (Resources.NotFoundException e) {
-            this.backgroundMusicID = null;
-        }
     }
 }

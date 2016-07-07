@@ -14,6 +14,7 @@ import java.util.List;
 import ch.templer.activities.R;
 import ch.templer.fragments.service.ResourceQueryService;
 import ch.templer.model.Scenario;
+import ch.templer.services.imageprocessing.ImageProcessingService;
 
 /**
  * Created by Templer on 6/22/2016.
@@ -42,7 +43,8 @@ public class ScenarioArrayAdapter extends ArrayAdapter<Scenario> {
         title.setText(values.get(position).getScenarioTitle());
         secondTitle.setText(values.get(position).getSecondaryTitle());
         description.setText(values.get(position).getDescription());
-        imageView.setImageResource(values.get(position).getIconId());
+        ImageProcessingService.loadBitmap(values.get(position).getIconId(), imageView,getContext());
+        //imageView.setImageResource(values.get(position).getIconId());
 
         return rowView;
     }

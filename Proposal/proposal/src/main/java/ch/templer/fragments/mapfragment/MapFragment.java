@@ -20,6 +20,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,12 +140,11 @@ public class MapFragment extends AbstractFragment implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mapLocationModel = (MapLocationModel) getArguments().getSerializable(MAP_FRAGMENT_MODEL_ID);
-            colorTheme= ColorTheme.constructColorTheme(mapLocationModel.getFragmentColors().getColorThemeType(),this.getContext());
+            colorTheme = ColorTheme.constructColorTheme(mapLocationModel.getFragmentColors().getColorThemeType(), this.getContext());
         }
         destinationLocation = new Location(getString(R.string.map_fragment_destination_title));
         destinationLocation.setLatitude(mapLocationModel.getLatitude());
         destinationLocation.setLongitude(mapLocationModel.getLongitude());
-
         buildGoogleApiClient();
     }
 
@@ -177,7 +177,7 @@ public class MapFragment extends AbstractFragment implements OnMapReadyCallback,
         fabToolbarLayout = (FABToolbarLayout) view.findViewById(R.id.fabtoolbar);
         fabtoolbar_fab = (FloatingActionButton) view.findViewById(R.id.fabtoolbar_fab);
         boolean debuggingEnabled = SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false);
-        if (!this.fragmentFinished || debuggingEnabled){
+        if (!this.isFragmentFinished()) {
             fabtoolbar_fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_navigation_white_40dp, null));
             fabtoolbar_fab.setBackgroundTintList(ColorStateList.valueOf(colorTheme.getMainColor()));
             fabtoolbar_fab.setOnClickListener(new View.OnClickListener() {
@@ -186,20 +186,22 @@ public class MapFragment extends AbstractFragment implements OnMapReadyCallback,
                     fabToolbarLayout.show();
                 }
             });
-            if (debuggingEnabled){
-                fabToolbarLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        finishNavigation();
-                    }
-                }, 5000);
-            }
-        }else{
+        } else {
             fabtoolbar_fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_forward_24dp, null));
             fabtoolbar_fab.setBackgroundTintList(ColorStateList.valueOf(colorTheme.getMainColor()));
+            ColorStateList colorStateList = ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.bright_green));
+            fabtoolbar_fab.setBackgroundTintList(colorStateList);
             prepareNextFragmentNavigation();
         }
 
+        if (debuggingEnabled && !isFragmentFinished()) {
+            fabToolbarLayout.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finishNavigation();
+                }
+            }, 5000);
+        }
 
         refresh = (ImageView) view.findViewById(R.id.refresh);
         car = (ImageView) view.findViewById(R.id.car);
@@ -412,7 +414,7 @@ public class MapFragment extends AbstractFragment implements OnMapReadyCallback,
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(1000); // Update location every second
 
-        if (!this.fragmentFinished){
+        if (!this.isFragmentFinished()) {
             //set this class as LocationListener
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
@@ -423,7 +425,6 @@ public class MapFragment extends AbstractFragment implements OnMapReadyCallback,
         if (mLastLocation != null) {
             currentLatitude = mLastLocation.getLatitude();
             currentLongitude = mLastLocation.getLongitude();
-
         }
     }
 
@@ -437,46 +438,69 @@ public class MapFragment extends AbstractFragment implements OnMapReadyCallback,
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
         // check if location is within the destination radius
-        if (location.distanceTo(destinationLocation) <= mapLocationModel.getRadius() && !fragmentFinished) {
+        if (location.distanceTo(destinationLocation) <= mapLocationModel.getRadius() && !isFragmentFinished()) {
             //this avoid more onLocationChanged events of entering this if clause
             finishNavigation();
         }
     }
 
     private void finishNavigation() {
-        transformFabToContinueButton();
+        //Checks if Fragment is attached to activity. This is necessary because otherwise it might causes a exception while rotating.
+        if (isAdded()) {
+            transformFabToContinueButton();
+        }
+    }
+
+    private void startUserFeedback() {
+        //hide toolbar
+        fabToolbarLayout.hide();
+        getSoundService().playSound(R.raw.navigation_success);
+        Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(pattern, -1);
+        SnackbarService.dismiss();
+        fabToolbarLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                fabToolbarLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        SnackbarService.showSnackbar(getContext(), coordinatorLayout, colorTheme.getSecondaryColor(), getString(R.string.map_fragment_location_reached_message), Snackbar.LENGTH_INDEFINITE);
+                    }
+                }, 500);
+            }
+        }, 200);
     }
 
     protected void transformFabToContinueButton() {
-        //hide toolbar
-        fabToolbarLayout.hide();
-        //user feedback
-        SoundService.playSound(this.getContext(), R.raw.navigation_success);
-        Vibrator v = (Vibrator) this.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(pattern, -1);
-        SnackbarService.showSnackbar(this.getContext(), coordinatorLayout, colorTheme.getSecondaryColor(), getString(R.string.map_fragment_location_reached_message), Snackbar.LENGTH_INDEFINITE, false);
-
         //transform animation. Animation is delayed, because of the user feedback above takes some time (Especially the toolbar hide animation)
         fabToolbarLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                ColorStateList colorStateList = ColorStateList.valueOf(getResources().getColor(R.color.bright_green));
-                Drawable drawable = getResources().getDrawable(R.drawable.ic_arrow_forward_24dp, null);
-                FabTransformAnimation fabTransformAnimation = new FabTransformAnimation(fabtoolbar_fab, colorStateList, drawable);
-                fabTransformAnimation.setAnimationFinishedListener(new AnimationFinishedListener() {
-                    @Override
-                    public void onAnimationFinished() {
-                        prepareNextFragmentNavigation();
-                    }
-                });
-                fabTransformAnimation.runAnimation();
+                if (isAdded()) {
+                    ColorStateList colorStateList = ColorStateList.valueOf(getResources().getColor(R.color.bright_green));
+                    Drawable drawable = getResources().getDrawable(R.drawable.ic_arrow_forward_24dp, null);
+                    FabTransformAnimation fabTransformAnimation = new FabTransformAnimation(fabtoolbar_fab, colorStateList, drawable);
+                    fabTransformAnimation.setAnimationFinishedListener(new AnimationFinishedListener() {
+                        @Override
+                        public void onAnimationFinished() {
+                            prepareNextFragmentNavigation();
+                            startUserFeedback();
+                        }
+                    });
+                    fabTransformAnimation.runAnimation();
+                }
             }
         }, 500);
     }
 
-
     private void prepareNextFragmentNavigation() {
-        fragmentFinished(fabtoolbar_fab, mRevealView, mRevealLayout);
+        fragmentFinished(fabtoolbar_fab, mRevealView, mRevealLayout, new TransactionCallback() {
+            @Override
+            public void onClick() {
+                SnackbarService.dismiss();
+            }
+        });
     }
 
     @Override
@@ -493,6 +517,7 @@ public class MapFragment extends AbstractFragment implements OnMapReadyCallback,
     @Override
     public void onDestroy() {
         super.onDestroy();
+        getSoundService().stop();
         mGoogleApiClient.disconnect();
     }
 

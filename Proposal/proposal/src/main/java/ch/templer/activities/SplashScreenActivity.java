@@ -37,7 +37,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             isIdSet = bundel.getBoolean(START_SCENARIO_DIRECTLY_BOOLEAN_FLAG);
             log.d("---------------> savedInstanceState found. position: " + id + " idisset: " + isIdSet);
         }
-        DeserializeJsonDataAsync yourTask = new DeserializeJsonDataAsync(new OnTaskCompleted() {
+                DeserializeJsonDataAsync yourTask = new DeserializeJsonDataAsync(new OnTaskCompleted() {
             @Override
             public void onTaskCompleted(DeserializeJsonDataAsyncParameters deserializeJsonDataAsyncParameters, ArrayList<Scenario> scenarios) {
                 if (deserializeJsonDataAsyncParameters.isIdSet()) {

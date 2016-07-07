@@ -91,7 +91,7 @@ public class ScenarioSelectionActivity extends ListActivity implements AdapterVi
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, scenario.getScenarioTitle());
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(getApplicationContext(),
-                        R.drawable.ic_launcher));
+                        scenarios.get(position).getIconId()));
 
         addIntent
                 .setAction("com.android.launcher.action.INSTALL_SHORTCUT");

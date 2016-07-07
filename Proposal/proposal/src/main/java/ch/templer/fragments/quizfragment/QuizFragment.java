@@ -1,6 +1,7 @@
 package ch.templer.fragments.quizfragment;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -57,7 +58,7 @@ public class QuizFragment extends AbstractFragment {
 
     private OnFragmentInteractionListener mListener;
     private int correctAnswersCounter = 0;
-    TextSwitcher textSwitcher;
+    private TextSwitcher textSwitcher;
     private List<AnswerButton> answerButtons = new ArrayList<>();
     private int questionCounter = 0;
     private boolean answerPressed = false;
@@ -119,8 +120,8 @@ public class QuizFragment extends AbstractFragment {
         answerButtons.add(answerButtonThree);
         answerButtons.add(answerButtonFour);
         setupButtons(questionAndAnswers);
-
-        if (fragmentFinished || SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false)) {
+        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(colorTheme.getMainColor()));
+        if (isFragmentFinished() || SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false)) {
             floatingActionButton.setVisibility(View.VISIBLE);
             fragmentFinished(floatingActionButton, mRevealView, mRevealLayout);
             //necessary for last question iteration
@@ -159,8 +160,19 @@ public class QuizFragment extends AbstractFragment {
 
         coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.CoordinatorLayout);
         coordinatorLayout.setBackgroundColor(colorTheme.getFragmentBackgroundColor());
+        coordinatorLayout.setVisibility(View.INVISIBLE);
 
         return (view);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isFragmentFirstStarted()) {
+            ViewAppearAnimation.runAnimation(coordinatorLayout, 2000);
+        } else {
+            coordinatorLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -249,7 +261,7 @@ public class QuizFragment extends AbstractFragment {
                 answerButton.setIsCorrectAnswer(questionAndAnswers.getAnswers().get(i).getCorrectAnswer());
                 answerButton.setBackgroundColor(colorTheme.getMainColor());
                 answerButton.setOnClickListener(quizClickListener);
-                SoundService.playSound(this.getContext(), R.raw.swoosh);
+                getSoundService().playSound(R.raw.swoosh);
 
             }
             FlipAnimation flipAnimation = new FlipAnimation(buttonContainer, buttonContainer);
@@ -270,14 +282,15 @@ public class QuizFragment extends AbstractFragment {
     }
 
     private void prepareNextFragmentButton() {
+        SnackbarService.dismiss();
         fragmentFinished(floatingActionButton, mRevealView, mRevealLayout);
         ViewAppearAnimation.runAnimation(floatingActionButton, quizModel.getFabAppearAnimationTime());
     }
 
     private void processCorrectAnswer(AnswerButton answerButton) {
         correctAnswersCounter++;
-        SnackbarService.showSnackbar(coordinatorLayout, getCurrentQuestion().getCorrectMessage(), colorTheme.getSecondaryColor(), Snackbar.LENGTH_LONG);
-        SoundService.playSound(this.getContext(), R.raw.correct);
+        SnackbarService.showSnackbar(coordinatorLayout, getCurrentQuestion().getCorrectMessage(), colorTheme.getSecondaryColor(), Snackbar.LENGTH_INDEFINITE);
+        getSoundService().playSound(R.raw.correct);
         updateTopBar();
         answerButton.setBackgroundColor(Colors.Green);
         BlinkAnimation blinkAnimation = new BlinkAnimation(answerButton, BLINK_ANIMATION_TIME, BLINK_AMOUNT);
@@ -308,11 +321,11 @@ public class QuizFragment extends AbstractFragment {
     }
 
     private void processWrongAnswer(AnswerButton answerButton) {
-        SoundService.playSound(this.getContext(), R.raw.wrong);
+        getSoundService().playSound(R.raw.wrong);
         answerButton.setBackgroundColor(Colors.Red);
 
         AnswerButton correctAnswerButton = getCorrectAnswerButton();
-        SnackbarService.showSnackbar(coordinatorLayout, getCurrentQuestion().getWrongMessage(), colorTheme.getSecondaryColor(), Snackbar.LENGTH_LONG);
+        SnackbarService.showSnackbar(coordinatorLayout, getCurrentQuestion().getWrongMessage(), colorTheme.getSecondaryColor(), Snackbar.LENGTH_INDEFINITE);
 
         correctAnswerButton.postDelayed(new Runnable() {
             @Override

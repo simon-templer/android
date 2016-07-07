@@ -1,5 +1,7 @@
 package ch.templer.model;
 
+import android.content.res.Resources;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -8,6 +10,7 @@ import com.google.android.gms.maps.MapFragment;
 
 import java.io.Serializable;
 
+import ch.templer.fragments.service.ResourceQueryService;
 import ch.templer.fragments.videofragment.VideoFragment;
 
 /**
@@ -30,6 +33,7 @@ public abstract class AbstractMessageModel implements Serializable {
 
     @JsonProperty("FragmentColors")
     private FragmentColors fragmentColors;
+    private Integer backgroundMusicID;
 
     public FragmentColors getFragmentColors() {
         return fragmentColors;
@@ -37,5 +41,17 @@ public abstract class AbstractMessageModel implements Serializable {
 
     public void setFragmentColors(FragmentColors fragmentColors) {
         this.fragmentColors = fragmentColors;
+    }
+
+    public Integer getBackgroundMusicID() {
+        return backgroundMusicID;
+    }
+
+    public void setBackgroundMusicID(String backgroundMusicID) {
+        try {
+            this.backgroundMusicID = ResourceQueryService.getRawByName(backgroundMusicID);
+        } catch (Resources.NotFoundException e) {
+            this.backgroundMusicID = null;
+        }
     }
 }

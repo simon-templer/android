@@ -1,6 +1,7 @@
 package ch.templer.fragments.textmessagesfragment;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import ch.templer.animation.ViewAppearAnimation;
 import ch.templer.controls.listener.AnimationFinishedListener;
 import ch.templer.controls.reveallayout.RevealLayout;
 import ch.templer.fragments.AbstractFragment;
+import ch.templer.model.ColorTheme;
 import ch.templer.model.TextMessagesModel;
 import ch.templer.services.SettingsService;
 import ch.templer.services.multimedia.SoundService;
@@ -45,6 +47,7 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
     private View mRevealView;
     private RevealLayout mRevealLayout;
     private boolean textAnimationFinished = false;
+    private ColorTheme colorTheme;
 
     protected static final class MyNonConfig {
         // fill with public variables keeping references and other state info, set to null
@@ -73,6 +76,7 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             textMessagesModel = (TextMessagesModel) getArguments().getSerializable(TEXT_MESSAGES_MODEL_ID);
+            colorTheme = ColorTheme.constructColorTheme(textMessagesModel.getFragmentColors().getColorThemeType(), getContext());
         }
     }
 
@@ -83,9 +87,9 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
             outState.putInt(TEXT_MESSAGE_POSITION_ID, textFadeInOutAnimation.getFadeCount());
         }
         outState.putInt(COLOR_TRANSITION_POSITION_ID, colorTransitionAnimation.getCurrentPosition());
-        outState.putInt(SONG_POSITION_ID, SoundService.getSongPosition());
+        outState.putInt(SONG_POSITION_ID, getSoundService().getSongPosition());
         outState.putBoolean(TEXT_ANIMATION_FINISHED, textAnimationFinished);
-        SoundService.stop();
+        getSoundService().stop();
     }
 
     @Override
@@ -95,7 +99,9 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
         View view = inflater.inflate(R.layout.fragment_text_messages, container, false);
 
         nextFragmentFab = (FloatingActionButton) view.findViewById(R.id.nextFragmentFab);
+        nextFragmentFab.setBackgroundTintList(ColorStateList.valueOf(colorTheme.getMainColor()));
         restartTextAnimationFab = (FloatingActionButton) view.findViewById(R.id.restartTextAnimationFab);
+        restartTextAnimationFab.setBackgroundTintList(ColorStateList.valueOf(colorTheme.getMainColor()));
         restartTextAnimationFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,7 +142,7 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
             textFadeInOutAnimation.setAnimationFinishedListener(this);
         }
 
-        if (fragmentFinished || SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false)) {
+        if (isFragmentFinished() || SettingsService.getInstance().getBooleanSetting(SettingsActivity.GENERAL_DEBUGGING_SWITCH, false)) {
             fragmentFinished(nextFragmentFab, mRevealView, mRevealLayout);
         } else {
             restartTextAnimationFab.setVisibility(View.INVISIBLE);
@@ -144,31 +150,11 @@ public class TextMessagesFragment extends AbstractFragment implements AnimationF
         }
 
         colorTransitionAnimation = new ColorTransitionAnimation(getContext(), frameLayout, textMessagesModel.getBackgroundAnimationColors(), textMessagesModel.getBackgrountColorTransitionTime(), currentColorTransitionPosition);
-        if (!SoundService.isPlaying()) {
-            SoundService.playSound(this.getContext(), textMessagesModel.getBackgroundMusicID(), songPosition);
+        if (!getSoundService().isPlaying()) {
+            getSoundService().playSound(textMessagesModel.getBackgroundMusicID(), songPosition);
         }
 
         return (view);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        SoundService.stop();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        SoundService.pause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!SoundService.isPlaying()) {
-            SoundService.resume();
-        }
     }
 
     @Override

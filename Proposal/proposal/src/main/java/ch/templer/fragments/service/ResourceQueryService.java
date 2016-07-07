@@ -29,6 +29,13 @@ public class ResourceQueryService {
         return mContext.getResources().getIdentifier(id, "drawable", mContext.getPackageName());
     }
 
+    public static int getDrawableHDPIByName(String id) throws Resources.NotFoundException {
+        if (!idCheck(id)) {
+            throw new Resources.NotFoundException();
+        }
+        return mContext.getResources().getIdentifier(id, "drawable-hdpi", mContext.getPackageName());
+    }
+
     public static int getRawByName(String id) throws Resources.NotFoundException {
         if (!idCheck(id)) {
             throw new Resources.NotFoundException();
